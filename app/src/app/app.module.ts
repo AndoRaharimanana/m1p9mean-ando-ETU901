@@ -9,11 +9,15 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { LoginComponent } from './client/form/login/login.component';
+import { SignupComponent } from './client/form/signup/signup.component';
+import { HeaderComponent } from './client/header/header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    SignupComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
