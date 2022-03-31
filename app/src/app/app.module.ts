@@ -11,13 +11,17 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import { LoginComponent } from './client/form/login/login.component';
 import { SignupComponent } from './client/form/signup/signup.component';
 import { HeaderComponent } from './client/header/header.component';
+import { HomeComponent } from './client/home/home.component';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     SignupComponent,
-    HeaderComponent
+    HeaderComponent,
+    HomeComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,

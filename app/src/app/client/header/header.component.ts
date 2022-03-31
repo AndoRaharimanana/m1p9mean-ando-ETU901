@@ -10,7 +10,8 @@ export class HeaderComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   clickout(event) {
     if(!event.target.className.includes("subMenu-section")){
-        this.hiddenAllMenu();
+        this.hiddenAllMenu("subMenu");
+        this.hiddenAllMenu("subMenuMob");
     }
     
   }
@@ -20,27 +21,34 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.hiddenAllMenu();
+    this.hiddenAllMenu("subMenu");
+    this.hiddenAllMenu("subMenuMob");
   }
 
 
 
-clickSubmenu(event){
+clickSubmenu(event, classname){
   var target = event.target;
-  var subMenu = target.parentElement.nextSibling;
+  var subMenu = null;
+  if(classname.localeCompare("subMenu") === 0){
+    subMenu = target.parentElement.nextSibling;
+  }else if(classname.localeCompare("subMenuMob") === 0){
+    subMenu = document.getElementById("subMenuMob");
+  }
+  
   var current = subMenu.getAttribute('class');
   
 
   if(current.includes("hidden")){
-    this.hiddenOthersMenu(subMenu);
+    this.hiddenOthersMenu(subMenu, classname);
     this.showSubMenu(subMenu);
   }else{
     this.hiddenSubMenu(subMenu);
   }
 }
 
-hiddenOthersMenu(current){
-  var subMenus = document.getElementsByClassName("subMenu");
+hiddenOthersMenu(current, classname){
+  var subMenus = document.getElementsByClassName(classname);
   for(var i = 0; i<subMenus.length; i++){
     if(current.id.localeCompare(subMenus[i].id) != 0){
       this.hiddenSubMenu(subMenus[i]);
@@ -48,8 +56,8 @@ hiddenOthersMenu(current){
   }
 }
 
-hiddenAllMenu(){
-  var subMenus = document.getElementsByClassName("subMenu");
+hiddenAllMenu(classname){
+  var subMenus = document.getElementsByClassName(classname);
   console.log(subMenus.length);
   for(var i = 0; i<subMenus.length; i++){
         this.hiddenSubMenu(subMenus[i]);
