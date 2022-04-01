@@ -1,0 +1,45 @@
+use e-kaly
+
+db.role.insertMany([
+	{"libelle": "super-utilisateur", "valeur": 10},
+	{"libelle": "utilisateur", "valeur": 1},
+	{"libelle": "livreur", "valeur": 3},
+	{"libelle": "resto", "valeur": 2}
+	]);
+	
+db.ville.insertMany([
+	{"libelle": "Analakely"},
+	{"libelle": "Ivato"}
+	]);	
+
+db.users.insert(
+	{"nom": "Rakoto",
+	"prenom":"Jean",
+	"email": "rakoto@mail.com",
+	"contact": "0342050010",
+	"adresse": "Andoharanofotsy",
+	"ville": ObjectId("62474abd67624f4e9b6c9946"),
+	"mdp": "123456",
+	"sexe": "homme",
+	"role": ObjectId("62474a5a67624f4e9b6c9942")
+	}
+	);
+	
+db.users.aggregate([
+	{
+		$lookup:{
+			from: "ville",
+			localField: "ville",
+			foreignField: "_id",
+			as: "ville"
+		}	
+	},
+	{
+		$lookup:{
+			from: "role",
+			localField: "role",
+			foreignField: "_id",
+			as: "role"
+		}
+	}
+]).pretty();
