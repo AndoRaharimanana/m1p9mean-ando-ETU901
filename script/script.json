@@ -43,3 +43,5 @@ db.users.aggregate([
 		}
 	}
 ]).pretty();
+
+db.users.update({"_id" : ObjectId("62474b2567624f4e9b6c9948")}, {$set: {mdp: "e10adc3949ba59abbe56e057f20f883e"}});
