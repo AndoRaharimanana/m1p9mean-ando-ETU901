@@ -13,6 +13,14 @@ import { SignupComponent } from './client/form/signup/signup.component';
 import { HeaderComponent } from './client/header/header.component';
 import { HomeComponent } from './client/home/home.component';
 import { FooterComponent } from './footer/footer.component';
+import { AdminLoginComponent } from './e-kaly/form/admin-login/admin-login.component';
+import { ListUsersComponent } from './e-kaly/users/list-users/list-users.component';
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { HeaderEKalyComponent } from './e-kaly/header-e-kaly/header-e-kaly.component';
+import { FicheUsersComponent } from './e-kaly/users/fiche-users/fiche-users.component';
+import { CreateUsersComponent } from './e-kaly/users/create-users/create-users.component';
+import { UpdateUsersComponent } from './e-kaly/users/update-users/update-users.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +29,13 @@ import { FooterComponent } from './footer/footer.component';
     SignupComponent,
     HeaderComponent,
     HomeComponent,
-    FooterComponent
+    FooterComponent,
+    AdminLoginComponent,
+    ListUsersComponent,
+    HeaderEKalyComponent,
+    FicheUsersComponent,
+    CreateUsersComponent,
+    UpdateUsersComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +44,8 @@ import { FooterComponent } from './footer/footer.component';
     FormsModule,
     NgxSpinnerModule,
     BrowserAnimationsModule,
-    DragDropModule
+    DragDropModule,
+    FontAwesomeModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [],
