@@ -85,3 +85,9 @@ db.users.aggregate([
 		$match:{nom: "Rajaona"}
 	}
 ])
+
+	db.users.aggregate([
+		{
+			$match:{nom: { $regex: "zafy", $options: "i" } }
+		}
+	]).pretty()

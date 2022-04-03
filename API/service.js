@@ -23,18 +23,45 @@ function saveToken(user, token){
     .catch(console.error);
 }
 
-async function checkAuth(token){            
-    return await Session.findOne({
-        $and:[
-            {
-                valeur: token
-            },
-            {
-                etat: 0
-            }                
-        ]
-    })
+async function checkAuth(token, refuser){  
+    var cdt = {};
+    cdt['valeur'] = token;
+    cdt['etat'] = 0;
+    return await Session.aggregate([
+		{
+            $match: cdt
+        },
+        {
+			$lookup:{
+				from: "users",
+				localField: "user",
+				foreignField: "_id",
+				as: "u"
+			}	
+		},
+		{
+			$lookup:{
+				from: "roles",
+				localField: "u.role",
+				foreignField: "_id",
+				as: "role"
+			}
+		} 
+    ])
     .then(result =>{ 
+        console.log(result);
+        console.log(refuser);
+        console.log("result.length "+result.length);
+        console.log("refuser.length "+refuser.length);
+        for(var i = 0; i<result.length; i++){
+            for(var j = 0; j<refuser.length; j++){
+                console.log("ref"+refuser[j] + " // role "+result[i].role[0].valeur );
+                if(refuser[j] === result[i].role[0].valeur){
+                    console.log("role refuse");
+                    return false;
+                }
+            }
+        }
         if(result === null){
             console.log("token non existant");
             return false;

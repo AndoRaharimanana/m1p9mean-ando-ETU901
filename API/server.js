@@ -45,7 +45,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                     ////***TEMPLATE DELETE */
     app.delete(prefixBackOffice+'/user/:id', async (req, res) =>{
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
 
         console.log(denied);
         if(!denied){
@@ -78,7 +78,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
 ////***TEMPLATE UPDATE */
     app.put(prefixBackOffice+'/user/update', async (req, res) =>{
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
 
         console.log(denied);
         if(!denied){
@@ -117,7 +117,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
     ////***TEMPLATE CREATE */
     app.post(prefixBackOffice+'/user/create', async (req, res) => {
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));        
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
         
         console.log(denied);
         if(!denied){
@@ -178,7 +178,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
           };
 console.log(options);
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
 
         console.log(denied);
         if(!denied){
@@ -265,7 +265,7 @@ console.log(options);
           };
 console.log(options);
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
 
         console.log(denied);
         if(!denied){
@@ -324,7 +324,7 @@ console.log(options);
     ////***TEMPLATE FICHE FINDBYID */
     app.get(prefixBackOffice+'/get-user/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
 
         console.log(denied);
         if(!denied){
@@ -377,7 +377,7 @@ console.log(options);
     ////***TEMPLATE PAGE UPDATE SI DATAFORM */
     app.get(prefixBackOffice+'/user/update/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
 
         console.log(denied);
         if(!denied){
@@ -434,7 +434,7 @@ console.log(options);
     ////***TEMPLATE PAGE CREATE SI DATAFORM */
     app.get(prefixBackOffice+'/user/create', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
 
         console.log(denied);
         if(!denied){
@@ -491,7 +491,7 @@ console.log(options);
 
     app.get(prefixBackOffice+'/signout', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'));
+        var denied = await service.checkAuth(req.header('authorization'), []);
 
         console.log(denied);
         if(!denied){
