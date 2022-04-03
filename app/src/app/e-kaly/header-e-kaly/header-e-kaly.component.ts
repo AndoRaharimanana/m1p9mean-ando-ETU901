@@ -1,4 +1,7 @@
 import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthServiceService } from '../../auth-service.service';
+import { BackOfficeService } from '../../service/back-office.service';
 
 @Component({
   selector: 'app-header-e-kaly',
@@ -7,6 +10,7 @@ import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
 })
 export class HeaderEKalyComponent implements OnInit {
   public text: String;
+  username = JSON.parse(localStorage.getItem("user"));
   @HostListener('document:click', ['$event'])
   clickout(event) {
     if(!event.target.className.includes("subMenu-section")){
@@ -16,7 +20,7 @@ export class HeaderEKalyComponent implements OnInit {
     
   }
 
-  constructor(private eRef: ElementRef) {
+  constructor(private eRef: ElementRef, private router: Router, private authService: AuthServiceService, private apiService: BackOfficeService) {    
     this.text = 'no clicks yet';
   }
 
@@ -75,5 +79,24 @@ showSubMenu(subMenu){
   subMenu.setAttribute("class", current.replaceAll("hidden", ""));
 }
 
+signout(){
+  this.apiService.logout().subscribe((data)=>{      
+    console.log(data);
+     console.log('ici =='+data['status']);
+     if(data['status'] === 200){
+      this.authService.signout();
+     }
+     else if(data['status'] === 202){
+     }else{
+      
+     }       
+     
+     this.router.navigate(['/access-admin']);  
+   },
+   err => {
+     console.log("errorr");
+     this.router.navigate(['/access-admin']);  
+   });         
+}
 
 }

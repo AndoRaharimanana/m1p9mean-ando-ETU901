@@ -1,16 +1,17 @@
 use e-kaly
 
-db.role.insertMany([
+db.roles.insertMany([
 	{"libelle": "super-utilisateur", "valeur": 10},
 	{"libelle": "utilisateur", "valeur": 1},
 	{"libelle": "livreur", "valeur": 3},
 	{"libelle": "resto", "valeur": 2}
 	]);
 	
-db.ville.insertMany([
+db.villes.insertMany([
 	{"libelle": "Analakely"},
 	{"libelle": "Ivato"}
 	]);	
+		
 
 db.users.insert(
 	{"nom": "Rakoto",
@@ -18,17 +19,17 @@ db.users.insert(
 	"email": "rakoto@mail.com",
 	"contact": "0342050010",
 	"adresse": "Andoharanofotsy",
-	"ville": ObjectId("62474abd67624f4e9b6c9946"),
+	"ville": ObjectId("62486e5eb51e6994ffaea350"),
 	"mdp": "123456",
 	"sexe": "homme",
-	"role": ObjectId("62474a5a67624f4e9b6c9942")
+	"role": ObjectId("62486e4eb51e6994ffaea34b")
 	}
 	);
 	
 db.users.aggregate([
 	{
 		$lookup:{
-			from: "ville",
+			from: "villes",
 			localField: "ville",
 			foreignField: "_id",
 			as: "ville"
@@ -36,7 +37,7 @@ db.users.aggregate([
 	},
 	{
 		$lookup:{
-			from: "role",
+			from: "roles",
 			localField: "role",
 			foreignField: "_id",
 			as: "role"
@@ -45,3 +46,42 @@ db.users.aggregate([
 ]).pretty();
 
 db.users.update({"_id" : ObjectId("62474b2567624f4e9b6c9948")}, {$set: {mdp: "e10adc3949ba59abbe56e057f20f883e"}});
+
+db.users.findOne({"sexe": "homme"}).select({"name": 1})
+
+db.users.update({"_id" : ObjectId("62474b2567624f4e9b6c9948")}, {$set: {ville: ObjectId("62486e5eb51e6994ffaea350")}});
+db.users.update({"_id" : ObjectId("62474b2567624f4e9b6c9948")}, {$set: {role: ObjectId("62486e4eb51e6994ffaea34b")}});
+
+
+db.roles.find().sort({valeur: 1})
+
+db.users.remove({nom: null})
+
+
+db.users.aggregate([
+	{
+		$match:{_id: ObjectId("62487ff0ce4044dfca07507c")}
+	},	
+	{
+		$lookup:{
+			from: "villes",
+			localField: "ville",
+			foreignField: "_id",
+			as: "ville"
+		}	
+	},
+	{
+		$lookup:{
+			from: "roles",
+			localField: "role",
+			foreignField: "_id",
+			as: "role"
+		}
+	}
+]).pretty();
+
+db.users.aggregate([
+	{
+		$match:{nom: "Rajaona"}
+	}
+])

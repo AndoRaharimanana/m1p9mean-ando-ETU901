@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BackOfficeService } from '../../../service/back-office.service';
 import {NgForm} from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthServiceService } from '../../../auth-service.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -10,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class AdminLoginComponent implements OnInit {
 
-  constructor(private apiService: BackOfficeService, private router: Router) { }
+  constructor(private apiService: BackOfficeService, private router: Router, private authService: AuthServiceService) { }
 
   ngOnInit(): void {
   }
@@ -20,6 +21,9 @@ export class AdminLoginComponent implements OnInit {
     this.apiService.login(form.value).subscribe((data) => {      
       console.log(data);
       if(data != null){
+        var user = data['data'];
+        var token = data['token'];
+        this.authService.signin(user, token);
         this.router.navigate(['/access-admin/auth/list-users']);  
       }
     })

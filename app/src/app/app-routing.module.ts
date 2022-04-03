@@ -32,7 +32,11 @@ const routes: Routes = [
     component: ListUsersComponent
   }  ,
   {
-    path: 'access-admin/auth/fiche-users',
+    path: 'access-admin/auth/list-users/:page',
+    component: ListUsersComponent
+  }  ,
+  {
+    path: 'access-admin/auth/fiche-users/:id',
     component: FicheUsersComponent
   }  ,
   {
@@ -40,7 +44,7 @@ const routes: Routes = [
     component: CreateUsersComponent
   }  ,
   {
-    path: 'access-admin/auth/update-users',
+    path: 'access-admin/auth/update-users/:id',
     component: UpdateUsersComponent
   }  
 ];

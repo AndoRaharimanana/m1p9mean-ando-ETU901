@@ -1,5 +1,5 @@
 <app-header-e-kaly></app-header-e-kaly>
-<button style="margin: 1% 2%" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Nouveau utilisateur + </button>
+<a href="{{domainename}}/access-admin/auth/create-users"><button style="margin: 1% 2%" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Nouveau utilisateur +</button></a>
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -33,13 +33,13 @@
     <tbody>
     <tr *ngFor="let user of users" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
     <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-    {{user.nom}}
+    <a href="{{domainename}}/access-admin/auth/fiche-users/{{user._id}}">{{user.nom}}</a>
     </th>
     <td class="px-6 py-4">
-    {{user.prenom}}
+      <a href="{{domainename}}/access-admin/auth/fiche-users/{{user._id}}">{{user.prenom}}</a>
     </td>
     <td class="px-6 py-4">
-    {{user.email}}
+      <a href="{{domainename}}/access-admin/auth/fiche-users/{{user._id}}">{{user.email}}</a>
     </td>
     <td class="px-6 py-4">
     {{user.adresse}}
@@ -56,12 +56,12 @@
     <td class="px-6 py-4 text-right">
 
         <div class="inline-flex rounded-md shadow-sm" role="group">
-            <button type="button" class="btn btn-yellow py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
+            <a href="{{domainename}}/access-admin/auth/update-users/{{user._id}}"><button type="button" class="btn btn-yellow py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
                 <fa-icon [icon]="faPencil"></fa-icon>
-            </button>
-            <button type="button" class="btn btn-red py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
+            </button></a>
+            <button (click)="deleteUser(user._id)" type="button" class="btn btn-red py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
                 <fa-icon [icon]="faRemove"></fa-icon>
-            </button>            
+            </button>          
             </div>
             
     </td>   
@@ -78,19 +78,10 @@
     </div>
     <div class="hidden md:flex-1 md:flex md:items-center md:justify-between">
       <div style="margin-right: 25%">
-        <p class="text-sm text-gray-700">
-          Showing
-          <span class="font-medium">1</span>
-          to
-          <span class="font-medium">10</span>
-          of
-          <span class="font-medium">97</span>
-          results
-        </p>
       </div>
       <div>
         <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-          <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          <a *ngIf="hasPrevPage === true" href="{{domainename}}/access-admin/auth/list-users/{{prevPage}}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
             <span class="sr-only">Previous</span>
             <!-- Heroicon name: solid/chevron-left -->
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -98,14 +89,8 @@
             </svg>
           </a>
           <!-- Current: "z-10 bg-indigo-50 border-indigo-500 text-indigo-600", Default: "bg-white border-gray-300 text-gray-500 hover:bg-gray-50" -->
-          <a href="#" aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> 1 </a>
-          <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> 2 </a>
-          <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"> 3 </a>
-          <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"> ... </span>
-          <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"> 8 </a>
-          <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> 9 </a>
-          <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> 10 </a>
-          <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          <a *ngFor="let number of numbers" href="{{domainename}}/access-admin/auth/list-users/{{number}}" aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> {{number}} </a>
+          <a *ngIf="hasNextPage === true" href="{{domainename}}/access-admin/auth/list-users/{{nextPage}}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
             <span class="sr-only">Next</span>
             <!-- Heroicon name: solid/chevron-right -->
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
