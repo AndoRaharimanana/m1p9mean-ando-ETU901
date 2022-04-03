@@ -21,6 +21,7 @@ import { HeaderEKalyComponent } from './e-kaly/header-e-kaly/header-e-kaly.compo
 import { FicheUsersComponent } from './e-kaly/users/fiche-users/fiche-users.component';
 import { CreateUsersComponent } from './e-kaly/users/create-users/create-users.component';
 import { UpdateUsersComponent } from './e-kaly/users/update-users/update-users.component';
+import { WINDOW_PROVIDERS } from './window.providers';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,7 @@ import { UpdateUsersComponent } from './e-kaly/users/update-users/update-users.c
     FontAwesomeModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [],
+  providers: [WINDOW_PROVIDERS],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 var aggregatePaginate = require("mongoose-aggregate-paginate-v2");
+//var aggregatePaginate = require("mongoose-aggregate-paginate");
 
 const userSchema = new mongoose.Schema({
     nom: String,

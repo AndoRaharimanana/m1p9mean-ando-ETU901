@@ -32,10 +32,6 @@ const routes: Routes = [
     component: ListUsersComponent
   }  ,
   {
-    path: 'access-admin/auth/list-users/:page',
-    component: ListUsersComponent
-  }  ,
-  {
     path: 'access-admin/auth/fiche-users/:id',
     component: FicheUsersComponent
   }  ,

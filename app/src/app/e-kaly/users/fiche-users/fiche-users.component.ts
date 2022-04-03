@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BackOfficeService } from '../../../service/back-office.service';
+import { WINDOW } from '../../../window.providers';
 
 @Component({
   selector: 'app-fiche-users',
@@ -10,8 +11,8 @@ import { BackOfficeService } from '../../../service/back-office.service';
 export class FicheUsersComponent implements OnInit {
   id: String;
   user: any;
-  domainename= "http://localhost:4200";
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router) { }
+  domainename= this.window.location.hostname;
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window) { }
 
   ngOnInit(): void {
     this.id=this._Activatedroute.snapshot.paramMap.get("id");

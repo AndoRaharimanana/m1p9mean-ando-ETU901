@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
+import * as myGlobals from '../../main'; 
+
 @Injectable({
   providedIn: 'root'
 })
 export class BackOfficeService {
-  prefix = "/back-office";
-  nomdomaine = "http://localhost:1010";
+  prefix = myGlobals.API_PREFIX_BACKEND;
+  nomdomaine = myGlobals.API_HOSTNAME;
   constructor(private http: HttpClient) { }
 
   getUsers() {
@@ -22,7 +24,7 @@ export class BackOfficeService {
     });
   }
 
-  getUsers_(page: String) {
+  /*getUsers_(page: String) {
     console.log(localStorage.getItem('token'));
     const header = new HttpHeaders({
       'Authorization': localStorage.getItem('token')
@@ -30,6 +32,32 @@ export class BackOfficeService {
     console.log(header);
     var c = this.nomdomaine+this.prefix+'/get-users/'+page;    
     return this.http.get(c, {
+      headers: header,
+      //withCredentials: true
+    });
+  }  
+
+  getUsersOrder(page: String, type: String, order: String) {
+    console.log(localStorage.getItem('token'));
+    const header = new HttpHeaders({
+      'Authorization': localStorage.getItem('token')
+    });    
+    console.log(header);
+    var c = this.nomdomaine+this.prefix+'/get-users/'+page+'/'+type+'/'+order;    
+    return this.http.get(c, {
+      headers: header,
+      //withCredentials: true
+    });
+  }  */
+  
+  searchUsers(page: String, type: String, order: String, critere: any) {
+    console.log(localStorage.getItem('token'));
+    const header = new HttpHeaders({
+      'Authorization': localStorage.getItem('token')
+    });    
+    console.log(header);
+    var c = this.nomdomaine+this.prefix+'/search-users/'+page+'/'+type+'/'+order;    
+    return this.http.post(c, critere,  {
       headers: header,
       //withCredentials: true
     });

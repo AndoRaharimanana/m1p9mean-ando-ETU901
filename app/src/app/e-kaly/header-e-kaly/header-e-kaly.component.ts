@@ -13,6 +13,16 @@ export class HeaderEKalyComponent implements OnInit {
   username = JSON.parse(localStorage.getItem("user"));
   @HostListener('document:click', ['$event'])
   clickout(event) {
+    console.log(event);
+    console.log(event.target.tagName);
+    console.log(event.target);
+    console.log(event.target.parentElement);
+    console.log(event.target.parentElement.tagName);
+    if((event.target.tagName.localeCompare("svg") == 0 && (event.target.parentElement.tagName.toLowerCase().localeCompare("fa-icon") == 0 || event.target.parentElement.tagName.toLowerCase().localeCompare("a") == 0)) || (event.target.tagName.localeCompare("path") == 0) && (event.target.parentElement.parentElement.tagName.toLowerCase().localeCompare("fa-icon") == 0 || event.target.parentElement.parentElement.tagName.toLowerCase().localeCompare("fa-icon") == 0)){
+      this.hiddenAllMenu("subMenu");
+      this.hiddenAllMenu("subMenuMob");      
+      return;
+    }
     if(!event.target.className.includes("subMenu-section")){
         this.hiddenAllMenu("subMenu");
         this.hiddenAllMenu("subMenuMob");
