@@ -90,4 +90,104 @@ db.users.aggregate([
 		{
 			$match:{nom: { $regex: "zafy", $options: "i" } }
 		}
-	]).pretty()
+	]).pretty();
+
+db.sessions.find().pretty();
+
+	db.sessions.aggregate([
+		{
+			$lookup:{
+				from: "users",
+				localField: "user",
+				foreignField: "_id",
+				as: "u"
+			}	
+		},
+		{
+			$lookup:{
+				from: "roles",
+				localField: "u.role",
+				foreignField: "_id",
+				as: "role"
+			}
+		}
+	]).pretty();
+
+	db.restos.insert(
+	{"nom": "Pho",
+	"contact": "0342050010",
+	"adresse": "Andoharanofotsy",
+	"ville": ObjectId("62486e5eb51e6994ffaea350"),
+	"users":[
+		{
+			"user": ObjectId("62474b2567624f4e9b6c9948"),
+			"etat": 0
+		}
+	] 
+	}
+	);
+	
+	
+	db.restos.aggregate([
+		{
+			$lookup: {
+				from: "villes",
+				localField: "ville",
+				foreignField: "_id",
+				as: "ville"
+			}			
+		}
+	]).pretty();
+
+	db.restos.aggregate([		
+		{
+			$lookup:{
+				from: "villes",
+				localField: "ville",
+				foreignField: "_id",
+				as: "ville"
+			}	
+		},
+		{
+			$lookup:{
+				from: "users",
+				localField: "users.user",
+				foreignField: "_id",
+				as: "users"
+			}	
+		}
+	]).pretty();	
+
+
+	db.users.aggregate([
+		{
+			$lookup:{
+				from: "roles",
+				localField: "role",
+				foreignField: "_id",
+				as: "role"
+			}	
+		},
+		{
+
+			$filter:{
+				role:{$eq: 10}
+			}
+		}
+	]
+	).pretty();
+	,
+		{
+
+		},
+		{
+			$project:{
+				role: {
+					$filter:{
+						input: "$role",
+						as: "role",
+						cond: {$eq: ["$$role.valeur", 10]}
+					}
+				}
+			}
+		}

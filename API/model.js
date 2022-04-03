@@ -27,14 +27,30 @@ const villeSchema = new mongoose.Schema({
     libelle: String
 });
 
+villeSchema.plugin(aggregatePaginate);
+
 const roleSchema = new mongoose.Schema({ 
     libelle: String,
     valeur: Number
 });
 
+roleSchema.plugin(aggregatePaginate);
+
+const restoSchema = new mongoose.Schema({ 
+    nom: String,
+    adresse: String,
+    ville: mongoose.Schema.Types.ObjectId,
+    contact: String,
+    users:[]
+});
+
+
+restoSchema.plugin(aggregatePaginate);
+
 const Users = new mongoose.model('users', userSchema);
 const Session = new mongoose.model('sessions', sessionSchema);
 const Ville = new mongoose.model('villes', villeSchema);
 const Role = new mongoose.model('roles', roleSchema);
+const Resto = new mongoose.model('restos', restoSchema);
   
-module.exports = { Users, Session, Ville, Role};
+module.exports = { Users, Session, Ville, Role, Resto};

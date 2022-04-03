@@ -22,6 +22,19 @@ import { FicheUsersComponent } from './e-kaly/users/fiche-users/fiche-users.comp
 import { CreateUsersComponent } from './e-kaly/users/create-users/create-users.component';
 import { UpdateUsersComponent } from './e-kaly/users/update-users/update-users.component';
 import { WINDOW_PROVIDERS } from './window.providers';
+import { CreateRestoComponent } from './e-kaly/resto/create-resto/create-resto.component';
+import { ListRestoComponent } from './e-kaly/resto/list-resto/list-resto.component';
+import { UpdateRestoComponent } from './e-kaly/resto/update-resto/update-resto.component';
+import { FicheRestoComponent } from './e-kaly/resto/fiche-resto/fiche-resto.component';
+import { ListRoleComponent } from './e-kaly/role/list-role/list-role.component';
+import { FicheRoleComponent } from './e-kaly/role/fiche-role/fiche-role.component';
+import { CreateRoleComponent } from './e-kaly/role/create-role/create-role.component';
+import { UpdateRoleComponent } from './e-kaly/role/update-role/update-role.component';
+import { ListVilleComponent } from './e-kaly/ville/list-ville/list-ville.component';
+import { CreateVilleComponent } from './e-kaly/ville/create-ville/create-ville.component';
+import { FicheVilleComponent } from './e-kaly/ville/fiche-ville/fiche-ville.component';
+import { UpdateVilleComponent } from './e-kaly/ville/update-ville/update-ville.component';
+
 
 @NgModule({
   declarations: [
@@ -36,7 +49,19 @@ import { WINDOW_PROVIDERS } from './window.providers';
     HeaderEKalyComponent,
     FicheUsersComponent,
     CreateUsersComponent,
-    UpdateUsersComponent
+    UpdateUsersComponent,
+    CreateRestoComponent,
+    ListRestoComponent,
+    UpdateRestoComponent,
+    FicheRestoComponent,
+    ListRoleComponent,
+    FicheRoleComponent,
+    CreateRoleComponent,
+    UpdateRoleComponent,
+    ListVilleComponent,
+    CreateVilleComponent,
+    FicheVilleComponent,
+    UpdateVilleComponent
   ],
   imports: [
     BrowserModule,
