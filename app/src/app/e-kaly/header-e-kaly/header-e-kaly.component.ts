@@ -1,7 +1,8 @@
-import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthServiceService } from '../../auth-service.service';
 import { BackOfficeService } from '../../service/back-office.service';
+import { WINDOW } from '../../window.providers';
 
 @Component({
   selector: 'app-header-e-kaly',
@@ -10,6 +11,7 @@ import { BackOfficeService } from '../../service/back-office.service';
 })
 export class HeaderEKalyComponent implements OnInit {
   public text: String;
+  domainename= this.window.location.hostname;
   username = JSON.parse(localStorage.getItem("user"));
   @HostListener('document:click', ['$event'])
   clickout(event) {
@@ -30,11 +32,12 @@ export class HeaderEKalyComponent implements OnInit {
     
   }
 
-  constructor(private eRef: ElementRef, private router: Router, private authService: AuthServiceService, private apiService: BackOfficeService) {    
+  constructor(private eRef: ElementRef, private router: Router, private authService: AuthServiceService, private apiService: BackOfficeService, @Inject(WINDOW) private window: Window) {    
     this.text = 'no clicks yet';
   }
 
   ngOnInit(): void {
+    console.log(this.domainename);
     this.hiddenAllMenu("subMenu");
     this.hiddenAllMenu("subMenuMob");
   }
