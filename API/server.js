@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const {  ServerApiVersion } = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 var nodemailer = require('nodemailer'); 
 const app = express();
@@ -11,7 +12,8 @@ var crypto = require('crypto');
 var aggregatePaginate = require("mongoose-aggregate-paginate-v2");  
 
 const dbName = "e-kaly";
-const url ='mongodb://localhost:27017';
+//const url ="mongodb://localhost:27017/e-kaly";
+const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/e-kaly-preprod?retryWrites=true&w=majority';
 const prefixBackOffice = "/back-office";
 const nbPageUser = 10;
 
@@ -34,10 +36,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-mongoose.connect("mongodb://localhost:27017/e-kaly", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(client=>{
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 }).then(client=>{
     console.log('Connected to Database Mongoose');  
     //**************BACK OFFICE START***************///
 
