@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BackOfficeService } from '../../../service/back-office.service';
 import {NgForm} from '@angular/forms';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-update-users',
@@ -13,9 +14,10 @@ export class UpdateUsersComponent implements OnInit {
   user: any;
   villes: any;
   roles: any;  
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
+    this.spinner.show();
     this.id=this._Activatedroute.snapshot.paramMap.get("id");
     this.apiService.getUpdateUser(this.id).subscribe((data)=>{      
       console.log(data);
@@ -30,15 +32,18 @@ export class UpdateUsersComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       } 
+       this.spinner.hide();       
      },
      err => {
        console.log("errorr");
-       this.router.navigate(['/access-admin']);  
+       this.router.navigate(['/access-admin']); 
+       this.spinner.hide();  
      });        
   }
 
   onSubmit(form: NgForm) {
+    this.spinner.show();
     console.log(form.value);
     this.apiService.updateUser(form.value).subscribe((data) => {      
       console.log(data);
@@ -49,11 +54,13 @@ export class UpdateUsersComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }         
+       }        
+       this.spinner.hide();  
     },
     err => {
       console.log("errorr");
-      this.router.navigate(['/access-admin']);  
+      this.router.navigate(['/access-admin']); 
+      this.spinner.hide();  
     })
 }  
 

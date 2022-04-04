@@ -1,5 +1,6 @@
 <app-header-e-kaly></app-header-e-kaly>
-<h1 style="text-align: center">Gestion utilisateur</h1>
+
+<h1 style="text-align: center">Gestion utilisateur </h1>
 <div class="mt-5 md:mt-0 md:col-span-2">
 <form #myform = "ngForm" (ngSubmit) = "onSubmit('1', sortBy, order.toString(), myform)" class="mt-8 space-y-6">
   <input type="hidden" name="remember" value="true">
@@ -27,12 +28,22 @@
 
     <div class="col-span-4 sm:col-span-2">
       <label for="last-name" class="block text-sm font-medium text-gray-700">Ville</label>
-      <input type="text" name="ville" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" ngModel>
+<!--      <input type="text" name="ville" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" ngModel>-->
+        <select name="ville" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" ngModel>                    
+          <option></option>
+          <option value="" [selected]>Tous</option>
+          <option *ngFor="let ville of villes" value="{{ville._id}}">{{ville.libelle}}</option>                    
+        </select>    
     </div>
 
     <div class="col-span-4 sm:col-span-2">
       <label for="last-name" class="block text-sm font-medium text-gray-700">Rôle</label>
-      <input type="text" name="role" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" ngModel>
+      <!--<input type="text" name="role" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" ngModel>-->
+      <select name="role" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" ngModel>
+        <option></option>
+        <option value="" [selected]>Tous</option>
+        <option *ngFor="let role of roles" value="{{role._id}}" [selected]="role.valeur === 1">{{role.libelle}}</option>
+      </select>      
     </div>        
   </div>
   </div>

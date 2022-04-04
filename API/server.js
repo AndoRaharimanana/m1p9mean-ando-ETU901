@@ -139,7 +139,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                             var send = {
                                 status: 200,
                                 message: "success",
-                                data: []
+                                data: result
                             };
                             res.json(send);
                         })
@@ -440,7 +440,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                             var send = {
                                 status: 200,
                                 message: "success",
-                                data: []
+                                data: result
                             };
                             res.json(send);
                         })
@@ -643,6 +643,47 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
 
     //****CRUD RESTO START */
 
+                ////***TEMPLATE REMOVE FROM ARRAY */
+                app.put(prefixBackOffice+'/resto/removeuser', async (req, res) =>{
+                    console.log('Auth '+req.header('authorization'));
+                    var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+            
+                    console.log(denied);
+                    if(!denied){
+                        console.log("token invalide");
+                        var send = {
+                            status: 202,
+                            message: "Accés refusé",
+                            data: []
+                        };
+                        res.json(send);
+                        return;
+                    }    
+                    console.log("token valide");
+                    var restoUpdate = {};                    
+                        var removeUser = {};
+                        removeUser = {
+                            'users': {
+                                user: mongoose.Types.ObjectId(req.body.removeUser)
+                            }
+                        };
+                        restoUpdate['$pull'] = removeUser;                        
+                    console.log(restoUpdate);
+                    await Resto.findByIdAndUpdate(req.body.id, 
+                        restoUpdate)
+                        .then(results =>{
+                            console.log(results);
+                            console.log("resto modifier");
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: []
+                            };
+                            res.json(send);
+                        })
+                        .catch(console.error);
+                });    
+
                     ////***TEMPLATE DELETE */
                     app.delete(prefixBackOffice+'/resto/:id', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
@@ -693,11 +734,25 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                             return;
                         }    
                         console.log("token valide");
+                        var restoUpdate = {};
+                        restoUpdate['nom'] = req.body.nom;
+                        restoUpdate['adresse'] = req.body.adresse;
+                        //console.log(req.body.ville);
+                        restoUpdate['ville'] = mongoose.Types.ObjectId(req.body.ville);
+                        restoUpdate['contact'] = req.body.contact;
+                        if(req.body.addUser!=null && req.body.addUser !== ""){                            
+                            var addUser = {};
+                            addUser = {
+                                users:{
+                                    "user": mongoose.Types.ObjectId(req.body.addUser),
+                                    "etat": 0
+                                }
+                            };
+                            restoUpdate['$push'] = addUser;
+                        }                        
+                        console.log(restoUpdate);
                         await Resto.findByIdAndUpdate(req.body.id, 
-                            {        nom : req.body.nom,   
-                                adresse : req.body.adresse,   
-                                ville: mongoose.Types.ObjectId(req.body.ville),  
-                                contact : req.body.contact  })
+                            restoUpdate)
                             .then(results =>{
                                 console.log(results);
                                 console.log("resto modifier");
@@ -742,7 +797,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                             var send = {
                                 status: 200,
                                 message: "success",
-                                data: []
+                                data: result
                             };
                             res.json(send);
                         })
@@ -751,7 +806,6 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                 
                     ////***TEMPLATE FINDALL INI */
                     app.get(prefixBackOffice+'/get-restos', async (req, res) =>{        
-                        console.log("EATY");
                         var p = 1;
                         var orderby = "nom";
                         var order = 1;
@@ -787,6 +841,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                         console.log("token valide");
                         const orderBy = {};
                         orderBy[orderby] = order;
+                        var dataform = await service.getVilles();                        
                         var cursor = Resto.aggregate([
                             {
                                 $lookup: {
@@ -805,6 +860,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                         .then(results => {
                             results['sortBy'] = orderby;
                             results['order'] = order;
+                            results['dataform'] = dataform;
                             console.log(results);
                             var send = {
                                 status: 200,
@@ -826,7 +882,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                         var critere = {};
                         if(req.body.nom!=null && req.body.nom !== "") critere["nom"] = {}, critere["nom"]["$regex"] = req.body.nom, critere["nom"]["$options"] = "i";
                         if(req.body.adresse!=null && req.body.adresse !== "") critere["adresse"] = {}, critere["adresse"]["$regex"] = req.body.adresse, critere["adresse"]["$options"] = "i";
-                        if(req.body.ville!=null && req.body.ville !== "") critere["ville"] = {}, critere["ville"]["$regex"] = req.body.ville, critere["ville"]["$options"] = "i";
+                        if(req.body.ville!=null && req.body.ville !== "") critere["ville"] = mongoose.Types.ObjectId(req.body.ville);
 
                         console.log(critere);
                 
@@ -862,6 +918,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                         console.log("token valide");
                         const orderBy = {};
                         orderBy[orderby] = order;
+                        var dataform = await service.getVilles();                        
                         var cursor = Resto.aggregate([
                             {
                                 $match: critere
@@ -883,6 +940,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                         .then(results => {
                             results['sortBy'] = orderby;
                             results['order'] = order;
+                            results['dataform'] = dataform;
                             console.log(results);
                             var send = {
                                 status: 200,
@@ -911,6 +969,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                             return;
                         }    
                         console.log("token valide");
+                        var dataform = await service.getUsersNotHaveResto();
                         const cursor = await Resto.aggregate([
                             {
                                 $match:{_id: mongoose.Types.ObjectId(req.params.id)}
@@ -937,10 +996,12 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
                         ])
                         .then(results => {
                             console.log(results);
+                            console.log(dataform);
                             var send = {
                                 status: 200,
                                 message: "success",
-                                data: results
+                                data: results,
+                                dataform: dataform
                             };
                             res.json(send);
                         })
@@ -1126,7 +1187,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
         newUser.contact = req.body.contact;   
         newUser.role = req.body.role;   
 
-
+console.log(newUser);
         await newUser.save()
         .then(result =>{
             console.log(result);
@@ -1134,7 +1195,7 @@ mongoose.connect("mongodb://localhost:27017/e-kaly", {
             var send = {
                 status: 200,
                 message: "success",
-                data: []
+                data: result
             };
             res.json(send);
         })
@@ -1178,6 +1239,7 @@ console.log(options);
         console.log("token valide");
         const orderBy = {};
         orderBy[orderby] = order;
+        var dataform = await service.dataForm();
         var cursor = Users.aggregate([
             {
                 $lookup: {
@@ -1204,6 +1266,7 @@ console.log(options);
         .then(results => {
             results['sortBy'] = orderby;
             results['order'] = order;
+            results['dataform'] = dataform;
             console.log(results);
             var send = {
                 status: 200,
@@ -1229,8 +1292,8 @@ console.log(options);
         if(req.body.prenom!=null && req.body.prenom !== "") critere["prenom"] = {}, critere["prenom"]["$regex"] = req.body.prenom, critere["prenom"]["$options"] = "i";
         if(req.body.email!=null && req.body.email !== "") critere["email"] = {}, critere["email"]["$regex"] = req.body.email, critere["email"]["$options"] = "i";
         if(req.body.adresse!=null && req.body.adresse !== "") critere["adresse"] = {}, critere["adresse"]["$regex"] = req.body.adresse, critere["adresse"]["$options"] = "i";
-        if(req.body.ville!=null && req.body.ville !== "") critere["ville"] = {}, critere["ville"]["$regex"] = req.body.ville, critere["ville"]["$options"] = "i";
-        if(req.body.role!=null && req.body.role !== "") critere["role"] = {}, critere["role"]["$regex"] = req.body.role, critere["role"]["$options"] = "i";
+        if(req.body.ville!=null && req.body.ville !== "") critere["ville"] =  mongoose.Types.ObjectId(req.body.ville);
+        if(req.body.role!=null && req.body.role !== "") critere["role"] = mongoose.Types.ObjectId(req.body.role);
         console.log(critere);
 
         if((req.params.page != null)){
@@ -1265,6 +1328,7 @@ console.log(options);
         console.log("token valide");
         const orderBy = {};
         orderBy[orderby] = order;
+        var dataform = await service.dataForm();
         var cursor = Users.aggregate([
             {
                 $match: critere
@@ -1294,6 +1358,7 @@ console.log(options);
         .then(results => {
             results['sortBy'] = orderby;
             results['order'] = order;
+            results['dataform'] = dataform;
             console.log(results);
             var send = {
                 status: 200,

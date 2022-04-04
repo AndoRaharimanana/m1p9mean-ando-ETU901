@@ -8,6 +8,7 @@ import { BackOfficeService } from '../../../service/back-office.service';
 import { WINDOW } from '../../../window.providers';
 import { ActivatedRoute, Router } from '@angular/router';
 import {NgForm} from '@angular/forms';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-list-users',
@@ -31,10 +32,13 @@ export class ListUsersComponent implements OnInit {
   order: Number;
   orderCurrent: Number;
   numbers: any;
+  villes: any;
+  roles: any;
 
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {   
+    this.spinner.show();
     var p = this._Activatedroute.snapshot.paramMap.get("page"); 
     var t = this._Activatedroute.snapshot.paramMap.get("type"); 
     var o = this._Activatedroute.snapshot.paramMap.get("order"); 
@@ -129,6 +133,8 @@ export class ListUsersComponent implements OnInit {
           this.hasNextPage = data['data']['hasNextPage'];
           this.sortBy = data['data']['sortBy'];
           this.order = data['data']['order'];
+          this.villes = data['data']['dataform'].ville;
+          this.roles = data['data']['dataform'].role;
           this.orderCurrent = this.order;
           if(this.order === 1){
             this.order = -1;
@@ -146,10 +152,12 @@ export class ListUsersComponent implements OnInit {
          }else{
           
          }       
+                   this.spinner.hide();
        },
        err => {
          console.log("errorr");
          this.router.navigate(['/access-admin']);  
+                   this.spinner.hide();
        });   
     //}
     
@@ -157,7 +165,8 @@ export class ListUsersComponent implements OnInit {
 
 
   deleteUser(id){
-    this.apiService.deleteUser(id).subscribe((data)=>{      
+    this.spinner.show();
+    this.apiService.deleteUser(id).subscribe((data)=>{            
       console.log(data);
        console.log('ici =='+data['status']);
        if(data['status'] === 200){
@@ -169,17 +178,22 @@ export class ListUsersComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }  
+       this.spinner.hide();     
      },
      err => {
        console.log("errorr");
-       this.router.navigate(['/access-admin']);  
+       this.router.navigate(['/access-admin']); 
+       this.spinner.hide(); 
      });       
   }
 
+
+
   onSubmit(numPage: String, typeSort: String, orderSort: String, form: NgForm) {
     console.log(form.value);
-    this.apiService.searchUsers(numPage, typeSort, orderSort, form.value).subscribe((data)=>{      
+    this.spinner.show();
+    this.apiService.searchUsers(numPage, typeSort, orderSort, form.value).subscribe((data)=>{            
       console.log(data);
        console.log('ici =='+data['status']);
        if(data['status'] === 200){
@@ -193,6 +207,8 @@ export class ListUsersComponent implements OnInit {
         this.hasNextPage = data['data']['hasNextPage'];
         this.sortBy = data['data']['sortBy'];
         this.order = data['data']['order'];
+        this.villes = data['data']['dataform'].ville;
+        this.roles = data['data']['dataform'].role;
         this.orderCurrent = this.order;
         if(this.order === 1){
           this.order = -1;
@@ -209,12 +225,14 @@ export class ListUsersComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }     
+        this.spinner.hide();   
      },
      err => {
        console.log(err);
-       this.router.navigate(['/access-admin']);  
-     });           
+       this.router.navigate(['/access-admin']); 
+       this.spinner.hide();   
+     });         
   }
 
 }

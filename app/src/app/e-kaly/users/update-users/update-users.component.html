@@ -31,7 +31,7 @@
     
                   <div class="col-span-6 sm:col-span-3">
                     <label for="country" class="block text-sm font-medium text-gray-700">Sexe</label>
-                    <select ngModel="{{user.sexe}}" name="sexe" id="country" name="country" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+                    <select ngModel="{{user.sexe}}" name="sexe" id="country"  autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
                       <option value="">Non défini</option>
                       <option [selected]="user.sexe === 'homme'" value="homme">Homme</option>
                       <option [selected]="user.sexe === 'femme'" value="femme">Femme</option>
@@ -45,7 +45,7 @@
     
                   <div class="col-span-6 sm:col-span-3">
                       <label for="first-name" class="block text-sm font-medium text-gray-700">Ville</label>
-                      <select ngModel="user.ville[0]._id" name="ville" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+                      <select ngModel="{{user.ville[0]._id}}" name="ville" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
                         <option value="">-</option>
                         <option *ngFor="let ville of villes" [selected]="user.ville[0]._id === ville._id" value="{{ville._id}}">{{ville.libelle}}</option>
                       </select>                    
@@ -58,7 +58,7 @@
                     <div class="col-span-6 sm:col-span-3">
                       <label for="country" class="block text-sm font-medium text-gray-700">Rôle</label>
                     
-                      <select ngModel="user.role[0]._id" name="role" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                      <select ngModel="{{user.role[0]._id}}" name="role" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         <option *ngFor="let role of roles" [selected]="user.role[0]._id === role._id" value="{{role._id}}">{{role.libelle}}</option>
                       </select>                       
                     </div>                       

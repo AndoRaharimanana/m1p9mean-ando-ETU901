@@ -26,7 +26,7 @@
     
                   <div class="col-span-6 sm:col-span-3">
                       <label for="first-name" class="block text-sm font-medium text-gray-700">Ville</label>
-                      <select ngModel="resto.ville[0]._id" name="ville" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+                      <select ngModel="{{resto.ville[0]._id}}" name="ville" autocomplete="country-name" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
                         <option value="">-</option>
                         <option *ngFor="let ville of villes" [selected]="resto.ville[0]._id === ville._id" value="{{ville._id}}">{{ville.libelle}}</option>
                       </select>                    

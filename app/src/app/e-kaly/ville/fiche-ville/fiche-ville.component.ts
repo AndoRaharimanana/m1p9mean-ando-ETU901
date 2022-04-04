@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BackOfficeService } from '../../../service/back-office.service';
 import { WINDOW } from '../../../window.providers';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-fiche-ville',
@@ -12,9 +13,10 @@ export class FicheVilleComponent implements OnInit {
   id: String;
   ville: any;
   domainename= this.window.location.hostname;
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
   
   ngOnInit(): void {
+    this.spinner.show();
     this.id=this._Activatedroute.snapshot.paramMap.get("id");
     this.apiService.getVille(this.id).subscribe((data)=>{      
       console.log(data);
@@ -26,14 +28,17 @@ export class FicheVilleComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }     
+       this.spinner.hide();   
      },
      err => {
        console.log("errorr");
        this.router.navigate(['/access-admin']);  
+       this.spinner.hide(); 
      });           
   }
   deleteVille(id){
+    this.spinner.show();
     this.apiService.deleteVille(id).subscribe((data)=>{      
       console.log(data);
        console.log('ici =='+data['status']);
@@ -45,10 +50,12 @@ export class FicheVilleComponent implements OnInit {
        }else{
         
        }       
+       this.spinner.hide(); 
      },
      err => {
        console.log("errorr");
        this.router.navigate(['/access-admin']);  
+       this.spinner.hide(); 
      });       
   }
   

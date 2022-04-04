@@ -249,6 +249,16 @@ getUpdateResto(id) {
     });     
   }
 
+  removeResto(resto:any){
+    const header = new HttpHeaders({
+      'Authorization': localStorage.getItem('token')
+    });  
+    return this.http.put(this.nomdomaine+this.prefix+"/resto/removeuser", resto, {
+      headers: header,
+      //withCredentials: true
+    });      
+  }  
+
 //////CRUD RESTO END///
 
 

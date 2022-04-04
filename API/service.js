@@ -102,6 +102,60 @@ async function getRoles(){
     .catch(console.error);
 }
 
+async function getUsersNotHaveResto(){
+    console.log("get users not have resto");
+    return await Users.aggregate([
+        {
+            $lookup:{
+				from: "restos",
+				localField: "_id",
+				foreignField: "users.user",
+				as: "restos"                
+            }
+        },
+		{
+			$match:{
+				restos:{
+					$eq: []
+				}
+			}
+		}
+    ])
+    .then(results => {
+        console.log(results);
+        return results;
+    })
+    .catch(console.error);
+}
+
+async function getUtilisateurByRole(role){
+    console.log("get utilisateur by role");
+    return await Users.aggregate([
+        {
+			$lookup:{
+				from: "roles",
+				localField: "role",
+				foreignField: "_id",
+				as: "role"
+			}            
+        },
+        {
+			$match:{
+				role:{
+					$elemMatch:{
+						valeur: role,
+					}
+				}
+			}
+        }
+    ])
+    .then(results => {
+        console.log(results);
+        return results;
+    })
+    .catch(console.error);
+}
+
 async function dataForm(){
     console.log("data form");
     var villes = await getVilles();
@@ -120,3 +174,5 @@ exports.tokenExpire = tokenExpire;
 exports.getRoles = getRoles;
 exports.getVilles = getVilles;
 exports.dataForm = dataForm;
+exports.getUtilisateurByRole = getUtilisateurByRole;
+exports.getUsersNotHaveResto = getUsersNotHaveResto;

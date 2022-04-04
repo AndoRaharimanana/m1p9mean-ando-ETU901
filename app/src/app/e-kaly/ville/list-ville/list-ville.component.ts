@@ -8,6 +8,7 @@ import { BackOfficeService } from '../../../service/back-office.service';
 import { WINDOW } from '../../../window.providers';
 import { ActivatedRoute, Router } from '@angular/router';
 import {NgForm} from '@angular/forms';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-list-ville',
@@ -32,10 +33,11 @@ export class ListVilleComponent implements OnInit {
   orderCurrent: Number;
   numbers: any;
   
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
   
   
   ngOnInit(): void {
+    this.spinner.show();
     this.apiService.getVilles().subscribe((data)=>{      
       console.log(data);
        console.log('ici =='+data['status']);
@@ -66,16 +68,19 @@ export class ListVilleComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }    
+       this.spinner.hide();    
      },
      err => {
        console.log("errorr");
        this.router.navigate(['/access-admin']);  
+       this.spinner.hide(); 
      });     
   }
   
   
   deleteVille(id){
+    this.spinner.show();
     this.apiService.deleteVille(id).subscribe((data)=>{      
       console.log(data);
        console.log('ici =='+data['status']);
@@ -88,15 +93,18 @@ export class ListVilleComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }   
+       this.spinner.hide();     
      },
      err => {
        console.log("errorr");
-       this.router.navigate(['/access-admin']);  
+       this.router.navigate(['/access-admin']); 
+       this.spinner.hide();  
      });       
   }
   
   onSubmit(numPage: String, typeSort: String, orderSort: String, form: NgForm) {
+    this.spinner.show();
     console.log(form.value);
     this.apiService.searchVilles(numPage, typeSort, orderSort, form.value).subscribe((data)=>{      
       console.log(data);
@@ -128,11 +136,13 @@ export class ListVilleComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }    
+       this.spinner.hide();    
      },
      err => {
        console.log(err);
        this.router.navigate(['/access-admin']);  
+       this.spinner.hide(); 
      });           
   }  
 }

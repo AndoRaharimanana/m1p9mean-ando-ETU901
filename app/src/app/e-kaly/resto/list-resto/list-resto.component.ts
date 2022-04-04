@@ -8,6 +8,7 @@ import { BackOfficeService } from '../../../service/back-office.service';
 import { WINDOW } from '../../../window.providers';
 import { ActivatedRoute, Router } from '@angular/router';
 import {NgForm} from '@angular/forms';
+import { NgxSpinnerService } from "ngx-spinner";
 @Component({
   selector: 'app-list-resto',
   templateUrl: './list-resto.component.html',
@@ -30,10 +31,12 @@ export class ListRestoComponent implements OnInit {
   order: Number;
   orderCurrent: Number;
   numbers: any;
+  villes: any;
 
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
+    this.spinner.show();
     this.apiService.getRestos().subscribe((data)=>{      
       console.log(data);
        console.log('ici =='+data['status']);
@@ -48,6 +51,7 @@ export class ListRestoComponent implements OnInit {
         this.hasNextPage = data['data']['hasNextPage'];
         this.sortBy = data['data']['sortBy'];
         this.order = data['data']['order'];
+        this.villes = data['data']['dataform'];
         this.orderCurrent = this.order;
         if(this.order === 1){
           this.order = -1;
@@ -64,15 +68,18 @@ export class ListRestoComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }  
+       this.spinner.hide();     
      },
      err => {
        console.log("errorr");
-       this.router.navigate(['/access-admin']);  
+       this.router.navigate(['/access-admin']);
+       this.spinner.hide();  
      });       
   }
 
   deleteResto(id){
+    this.spinner.show();
     this.apiService.deleteResto(id).subscribe((data)=>{      
       console.log(data);
        console.log('ici =='+data['status']);
@@ -85,15 +92,18 @@ export class ListRestoComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }    
+       this.spinner.hide();    
      },
      err => {
        console.log("errorr");
-       this.router.navigate(['/access-admin']);  
+       this.router.navigate(['/access-admin']); 
+       this.spinner.hide();  
      });       
   }
 
   onSubmit(numPage: String, typeSort: String, orderSort: String, form: NgForm) {
+    this.spinner.show();
     console.log(form.value);
     this.apiService.searchRestos(numPage, typeSort, orderSort, form.value).subscribe((data)=>{      
       console.log(data);
@@ -109,6 +119,7 @@ export class ListRestoComponent implements OnInit {
         this.hasNextPage = data['data']['hasNextPage'];
         this.sortBy = data['data']['sortBy'];
         this.order = data['data']['order'];
+        this.villes = data['data']['dataform'];
         this.orderCurrent = this.order;
         if(this.order === 1){
           this.order = -1;
@@ -125,11 +136,13 @@ export class ListRestoComponent implements OnInit {
         this.router.navigate(['/access-admin']);  
        }else{
         
-       }       
+       }      
+       this.spinner.hide();  
      },
      err => {
        console.log(err);
-       this.router.navigate(['/access-admin']);  
+       this.router.navigate(['/access-admin']); 
+       this.spinner.hide();  
      });           
   }
 

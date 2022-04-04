@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthServiceService } from '../../auth-service.service';
 import { BackOfficeService } from '../../service/back-office.service';
 import { WINDOW } from '../../window.providers';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-header-e-kaly',
@@ -32,7 +33,7 @@ export class HeaderEKalyComponent implements OnInit {
     
   }
 
-  constructor(private eRef: ElementRef, private router: Router, private authService: AuthServiceService, private apiService: BackOfficeService, @Inject(WINDOW) private window: Window) {    
+  constructor(private eRef: ElementRef, private router: Router, private authService: AuthServiceService, private apiService: BackOfficeService, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) {    
     this.text = 'no clicks yet';
   }
 
@@ -93,6 +94,7 @@ showSubMenu(subMenu){
 }
 
 signout(){
+  this.spinner.show();
   this.apiService.logout().subscribe((data)=>{      
     console.log(data);
      console.log('ici =='+data['status']);
@@ -104,11 +106,13 @@ signout(){
       
      }       
      
-     this.router.navigate(['/access-admin']);  
+     this.router.navigate(['/access-admin']); 
+     this.spinner.hide();  
    },
    err => {
      console.log("errorr");
-     this.router.navigate(['/access-admin']);  
+     this.router.navigate(['/access-admin']); 
+     this.spinner.hide();  
    });         
 }
 
