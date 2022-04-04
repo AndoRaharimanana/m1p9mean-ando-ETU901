@@ -12,5 +12,5 @@ if (environment.production) {
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
 
-  export const API_HOSTNAME = "http://localhost:1010";
+  export const API_HOSTNAME = "https://e-kaly-preprod.herokuapp.com";
   export const API_PREFIX_BACKEND = "/back-office";
