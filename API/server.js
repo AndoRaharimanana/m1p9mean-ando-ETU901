@@ -17,12 +17,12 @@ const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/
 const prefixBackOffice = "/back-office";
 const nbPageUser = 10;
 
-/*app.listen(process.env.PORT , function(){ 
+app.listen(process.env.PORT , function(){ 
     var u = new Users();
     u.id = 546456564;
     console.log(service.createToken(u));  
     console.log("listening on 1010");
-});*/
+});
 
 
 app.use(bodyParser.urlencoded({extended: true}));
