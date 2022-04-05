@@ -21,6 +21,7 @@
     "filelist": "^1.0.2",
     "jake": "^10.8.4",
     "mongodb": "^4.4.1",
+    "mongoose": "^6.2.10",
     "nodemailer": "^6.7.3",
     "nodemon": "^2.0.15"
   }
