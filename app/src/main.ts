@@ -12,5 +12,5 @@ if (environment.production) {
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
 
-  export const API_HOSTNAME = "https://e-kaly-preprod.herokuapp.com";
+  export const API_HOSTNAME = "https://m1p9mean-ando-etu901-api.herokuapp.com";
   export const API_PREFIX_BACKEND = "/back-office";
