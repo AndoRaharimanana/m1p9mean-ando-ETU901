@@ -21,7 +21,19 @@ import { ListVilleComponent } from './e-kaly/ville/list-ville/list-ville.compone
 import { CreateVilleComponent } from './e-kaly/ville/create-ville/create-ville.component';
 import { FicheVilleComponent } from './e-kaly/ville/fiche-ville/fiche-ville.component';
 import { UpdateVilleComponent } from './e-kaly/ville/update-ville/update-ville.component';
+import { ListCategoriePlatComponent } from './resto/categorie/list-categorie-plat/list-categorie-plat.component';
+import { FicheCategoriePlatComponent } from './resto/categorie/fiche-categorie-plat/fiche-categorie-plat.component';
+import { CreateCategoriePlatComponent } from './resto/categorie/create-categorie-plat/create-categorie-plat.component';
+import { UpdateCategoriePlatComponent } from './resto/categorie/update-categorie-plat/update-categorie-plat.component';
+import { RestoLoginComponent } from './resto/form/resto-login/resto-login.component';
+import { ChooseComponent } from './resto/choose/choose.component';
+import { ListPlatComponent } from './resto/plat/list-plat/list-plat.component';
+import { FichePlatComponent } from './resto/plat/fiche-plat/fiche-plat.component';
+import { CreatePlatComponent } from './resto/plat/create-plat/create-plat.component';
+import { UpdatePlatComponent } from './resto/plat/update-plat/update-plat.component';
 
+var ADMIN_PATH = 'access-admin/auth';
+var RESTO_PATH = 'access-admin/resto';
 const routes: Routes = [
   {
     path: '',
@@ -40,68 +52,108 @@ const routes: Routes = [
     component: AdminLoginComponent
   }  ,
   {
-    path: 'access-admin/auth/list-users',
+    path: ADMIN_PATH+'/list-users',
     component: ListUsersComponent
   }  ,
   {
-    path: 'access-admin/auth/fiche-users/:id',
+    path: ADMIN_PATH+'/fiche-users/:id',
     component: FicheUsersComponent
   }  ,
   {
-    path: 'access-admin/auth/create-users',
+    path: ADMIN_PATH+'/create-users',
     component: CreateUsersComponent
   }  ,
   {
-    path: 'access-admin/auth/update-users/:id',
+    path: ADMIN_PATH+'/update-users/:id',
     component: UpdateUsersComponent
   }   ,
   {
-    path: 'access-admin/auth/list-restos',
+    path: ADMIN_PATH+'/list-restos',
     component: ListRestoComponent
   }  ,
   {
-    path: 'access-admin/auth/fiche-restos/:id',
+    path: ADMIN_PATH+'/fiche-restos/:id',
     component: FicheRestoComponent
   }  ,
   {
-    path: 'access-admin/auth/create-restos',
+    path: ADMIN_PATH+'/create-restos',
     component: CreateRestoComponent
   }  ,
   {
-    path: 'access-admin/auth/update-restos/:id',
+    path: ADMIN_PATH+'/update-restos/:id',
     component: UpdateRestoComponent
   }   ,
   {
-    path: 'access-admin/auth/list-roles',
+    path: ADMIN_PATH+'/list-roles',
     component: ListRoleComponent
   }  ,
   {
-    path: 'access-admin/auth/fiche-roles/:id',
+    path: ADMIN_PATH+'/fiche-roles/:id',
     component: FicheRoleComponent
   }  ,
   {
-    path: 'access-admin/auth/create-roles',
+    path: ADMIN_PATH+'/create-roles',
     component: CreateRoleComponent
   }  ,
   {
-    path: 'access-admin/auth/update-roles/:id',
+    path: ADMIN_PATH+'/update-roles/:id',
     component: UpdateRoleComponent
   } ,
   {
-    path: 'access-admin/auth/list-villes',
+    path: ADMIN_PATH+'/list-villes',
     component: ListVilleComponent
   }  ,
   {
-    path: 'access-admin/auth/fiche-villes/:id',
+    path: ADMIN_PATH+'/fiche-villes/:id',
     component: FicheVilleComponent
   }  ,
   {
-    path: 'access-admin/auth/create-villes',
+    path: ADMIN_PATH+'/create-villes',
     component: CreateVilleComponent
   }  ,
   {
-    path: 'access-admin/auth/update-villes/:id',
+    path: ADMIN_PATH+'/update-villes/:id',
     component: UpdateVilleComponent
+  } ,
+  {
+    path: RESTO_PATH,
+    component: RestoLoginComponent
+  } ,
+  {
+    path: RESTO_PATH+'/choose',
+    component: ChooseComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/list-categorieplats',
+    component: ListCategoriePlatComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/fiche-categorieplats/:id',
+    component: FicheCategoriePlatComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/create-categorieplats',
+    component: CreateCategoriePlatComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/update-categorieplats/:id',
+    component: UpdateCategoriePlatComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/list-plats',
+    component: ListPlatComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/fiche-plats/:id',
+    component: FichePlatComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/create-plats',
+    component: CreatePlatComponent
+  }  ,
+  {
+    path: RESTO_PATH+'/update-plats/:id',
+    component: UpdatePlatComponent
   } 
 ];
 

@@ -19,6 +19,7 @@
     "ejs": "^3.1.6",
     "express": "^4.17.3",
     "filelist": "^1.0.2",
+    "formidable": "^2.0.1",
     "jake": "^10.8.4",
     "mongodb": "^4.4.1",
     "mongoose": "^6.2.10",

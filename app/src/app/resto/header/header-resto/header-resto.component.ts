@@ -1,19 +1,19 @@
 import { Component, OnInit, ElementRef, HostListener, Inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthServiceService } from '../../auth-service.service';
-import { BackOfficeService } from '../../service/back-office.service';
-import { WINDOW } from '../../window.providers';
+import { AuthServiceService } from '../../../auth-service.service';
+import { BackOfficeService } from '../../../service/back-office.service';
+import { WINDOW } from '../../../window.providers';
 import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
-  selector: 'app-header-e-kaly',
-  templateUrl: './header-e-kaly.component.html',
-  styleUrls: ['./header-e-kaly.component.css']
+  selector: 'app-header-resto',
+  templateUrl: './header-resto.component.html',
+  styleUrls: ['./header-resto.component.css']
 })
-export class HeaderEKalyComponent implements OnInit {
+export class HeaderRestoComponent implements OnInit {
   public text: String;
   domainename= this.window.location.hostname;
-  username = JSON.parse(localStorage.getItem("user"));
+  resto = JSON.parse(localStorage.getItem("resto"));
   @HostListener('document:click', ['$event'])
   clickout(event) {
     console.log(event);
@@ -100,20 +100,20 @@ signout(origin: any){
      console.log('ici =='+data['status']);
      if(data['status'] === 200){
       this.authService.signout();
+      localStorage.removeItem("resto");
      }
      else if(data['status'] === 202){
      }else{
       
      }       
      
-     this.router.navigate(['/access-admin']); 
+     this.router.navigate(['/access-admin/resto']); 
      this.spinner.hide();  
    },
    err => {
      console.log("errorr");
-     this.router.navigate(['/access-admin']); 
+     this.router.navigate(['/access-admin/resto']); 
      this.spinner.hide();  
    });         
 }
-
 }

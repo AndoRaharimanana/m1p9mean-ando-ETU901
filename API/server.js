@@ -5,19 +5,26 @@ const MongoClient = require('mongodb').MongoClient;
 var nodemailer = require('nodemailer'); 
 const app = express();
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-const { Users, Session, Role, Ville, Resto } = require("./model");
+const { Users, Session, Role, Ville, Resto, CategoriePlat, Plat } = require("./model");
 var service = require("./service");
 const mongoose = require('mongoose');
 var crypto = require('crypto');
 var aggregatePaginate = require("mongoose-aggregate-paginate-v2");  
+var formidable = require('formidable'); 
+var fs = require('fs');
 
 const dbName = "e-kaly";
-//const url ="mongodb://localhost:27017/e-kaly";
-const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/e-kaly-preprod?retryWrites=true&w=majority';
+const url ="mongodb://localhost:27017/e-kaly";
+//const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/e-kaly-preprod?retryWrites=true&w=majority';
 const prefixBackOffice = "/back-office";
+const prefixResto = "/resto";
+
+const access_backoffice = [1, 2, 3];
+const access_resto = [1, 2, 3];
 const nbPageUser = 10;
 
-app.listen(process.env.PORT , function(){ 
+//process.env.PORT
+app.listen(1010  , function(){ 
     var u = new Users();
     u.id = 546456564;
     console.log(service.createToken(u));  
@@ -36,8 +43,931 @@ app.use(function(req, res, next) {
     next();
 });
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 }).then(client=>{
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }).then(client=>{
     console.log('Connected to Database Mongoose');  
+
+app.get('/page-upload-test', (req, res)=>{
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write('<form action="/upload-test" method="post" enctype="multipart/form-data">');
+    res.write('<input type="file" name="filetoupload"><br>');
+    res.write('<input type="submit">');
+    res.write('</form>');
+    return res.end();    
+});
+
+app.post('/upload-test', (req, res) =>{
+    var form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+        var oldpath = files.filetoupload.filepath;
+        var newpath = 'C:/Users/rahar/Documents/MEAN/' + files.filetoupload.originalFilename;
+        fs.rename(oldpath, newpath, function (err) {
+          if (err) throw err;
+          res.write('File uploaded and moved!');
+          res.end(); 
+        });
+    });
+});
+
+    ///////////********RESTO START* */
+////**/*GET RESTO PROP USER START*/
+                    app.get(prefixResto+'/choose', async (req, res) =>{        
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(denied == null){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }  
+                        var send = {
+                            status: 200,
+                            message: "success",
+                            data: denied[0].restos
+                        };
+                        res.json(send);                        
+                    });  
+////**/*GET RESTO PROP USER END*/
+
+
+/****CRUD  PLAT START */
+
+
+                    ////***TEMPLATE DELETE */
+                    app.delete(prefixResto+'/plat/:restoid/:id', async (req, res) =>{
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");        
+                        console.log(req.params.id);
+                        await Plat.findByIdAndDelete(
+                            req.params.id
+                        )
+                        .then(result => {
+                            console.log(result);
+                            console.log("plat delete");
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: []
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))
+                    });
+                ////***TEMPLATE UPDATE */
+                    app.put(prefixResto+'/plat/update/:restoid', async (req, res) =>{
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        console.log(req.body.id);
+                        console.log(req.body.libelle);
+                        await Plat.findByIdAndUpdate(req.body.id, 
+                            {        libelle : req.body.libelle,
+                                     categorie : mongoose.Types.ObjectId(req.body.categorie),
+                                     createur : mongoose.Types.ObjectId(req.params.restoid),
+                                     description : req.body.description,
+                                     recette : req.body.recette        
+                              })
+                            .then(results =>{
+                                console.log(results);
+                                console.log("plat modifier");
+                                var send = {
+                                    status: 200,
+                                    message: "success",
+                                    data: []
+                                };
+                                res.json(send);
+                            })
+                            .catch(console.error);
+                    });    
+                
+                    ////***TEMPLATE CREATE */
+                    app.post(prefixResto+'/plat/create/:restoid', async (req, res) => {
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        var newPlat = new Plat();
+                        newPlat.libelle = req.body.libelle;        
+                        newPlat.categorie = mongoose.Types.ObjectId(req.body.categorie);        
+                        newPlat.createur = mongoose.Types.ObjectId(req.params.restoid);        
+                        newPlat.description = req.body.description;        
+                        newPlat.recette = req.body.recette;        
+                
+                
+                        await newPlat.save()
+                        .then(result =>{
+                            console.log(result);
+                            console.log("plat enregistrer");
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: result
+                            };
+                            res.json(send);
+                        })
+                        .catch(console.error);
+                    });       
+                
+                    ////***TEMPLATE FINDALL INI */
+                    app.get(prefixResto+'/get-plats/:restoid', async (req, res) =>{                                
+                        var p = 1;
+                        var orderby = "libelle";
+                        var order = 1;
+                        /*if((req.params.page != null)){
+                            p = req.params.page;
+                        }
+                        if((req.params.orderby != null)){
+                            orderby = req.params.orderby;
+                        }
+                        if((req.params.order != null)){
+                            order = parseInt(req.params.order);
+                        }      */          
+                        console.log(p);
+                        const options = {
+                            page: p,
+                            limit: nbPageUser,
+                          };
+                console.log(options);
+                        console.log('Auth '+req.header('authorization'));                                                
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        console.log("token valide");
+                        const orderBy = {};
+                        orderBy[orderby] = order;
+                        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});                        
+                        var cursor = Plat.aggregate([
+                            {
+                                $match: {createur: mongoose.Types.ObjectId(req.params.restoid)}
+                            },  
+                            {
+                                $lookup: {
+                                    from: "categorieplats",
+                                    localField: "categorie",
+                                    foreignField: "_id",
+                                    as: "categorie"
+                                }
+                            },                          
+                            {
+                                $sort: orderBy
+                            }
+                        ]);
+                        //cursor.match({nom: "Rakoto"});
+                        Plat.aggregatePaginate(cursor, options)
+                        .then(results => {
+                            results['sortBy'] = orderby;
+                            results['order'] = order;
+                            results['dataform'] = dataform;
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))            
+                    });   
+                
+                    ////***TEMPLATE SEARCH LIST */
+                    app.post(prefixResto+'/search-plats/:restoid/:page?/:orderby?/:order?', async (req, res) =>{        
+                        
+  
+                        var p = 1;
+                        var orderby = "libelle";
+                        var order = 1;
+                        var critere = {};
+                        if(req.body.libelle!=null && req.body.libelle !== "") critere["libelle"] = {}, critere["libelle"]["$regex"] = req.body.libelle, critere["libelle"]["$options"] = "i";
+                        if(req.body.categorie!=null && req.body.categorie !== "") critere["categorie"] = mongoose.Types.ObjectId(req.body.categorie);
+                        critere["createur"] = mongoose.Types.ObjectId(req.params.restoid);
+                        if(req.body.description!=null && req.body.description !== "") critere["description"] = {}, critere["description"]["$regex"] = req.body.description, critere["description"]["$options"] = "i";
+                        if(req.body.recette!=null && req.body.recette !== "") critere["recette"] = {}, critere["recette"]["$regex"] = req.body.recette, critere["recette"]["$options"] = "i";
+                        
+                        console.log(critere);
+                
+                        if((req.params.page != null)){
+                            p = req.params.page;
+                        }
+                        if((req.params.orderby != null)){
+                            orderby = req.params.orderby;
+                        }
+                        if((req.params.order != null)){
+                            order = parseInt(req.params.order);
+                        }                
+                        console.log(p);
+                        const options = {
+                            page: p,
+                            limit: nbPageUser,
+                          };
+                console.log(options);
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        const orderBy = {};
+                        orderBy[orderby] = order;
+                        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});                        
+                        var cursor = Plat.aggregate([
+                            {
+                                $match: critere
+                            },  
+                            {
+                                $lookup: {
+                                    from: "categorieplats",
+                                    localField: "categorie",
+                                    foreignField: "_id",
+                                    as: "categorie"
+                                }
+                            
+                            },
+                            {
+                                $sort: orderBy
+                            }
+                        ]);
+                        //cursor.match({nom: "Rakoto"});
+                        Plat.aggregatePaginate(cursor, options)
+                        .then(results => {
+                            results['sortBy'] = orderby;
+                            results['order'] = order;
+                            results['dataform'] = dataform;
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))            
+                    });    
+                 
+                    ////***TEMPLATE FICHE FINDBYID */
+                    app.get(prefixResto+'/get-plat/:restoid/:id', async (req, res) =>{        
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        const cursor = await Plat.aggregate([
+                            {
+                                $match:{_id: mongoose.Types.ObjectId(req.params.id)}
+                            },            
+                            {
+                                $lookup: {
+                                    from: "categorieplats",
+                                    localField: "categorie",
+                                    foreignField: "_id",
+                                    as: "categorie"
+                                }
+                            },
+                            {
+                                $limit: 1
+                            }
+                        ])
+                        .then(results => {
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))                     
+                    });       
+  
+    ////***TEMPLATE PAGE CREATE SI DATAFORM */
+    app.get(prefixResto+'/plat/create/:restoid', async (req, res) =>{        
+        console.log('Auth '+req.header('authorization'));
+        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+        console.log(denied);
+        if(!denied){
+            console.log("token invalide");
+            var send = {
+                status: 202,
+                message: "Accés refusé",
+                data: []
+            };
+            res.json(send);
+            return;
+        }    
+
+        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+        if(!denied2){
+            console.log("token invalide");
+            var send = {
+                status: 201,
+                message: "Choix resto",
+                data: []
+            };
+            res.json(send);
+            return;
+        }     
+        console.log("token valide");
+        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});                        
+        var send = {
+            status: 200,
+            message: "success",
+            data: dataform
+        };
+        res.json(send);                    
+    });  
+
+
+    ////***TEMPLATE PAGE UPDATE SI DATAFORM */
+    app.get(prefixResto+'/plat/update/:restoid/:id', async (req, res) =>{        
+        console.log('Auth '+req.header('authorization'));
+        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+        console.log(denied);
+
+        if(!denied){
+            console.log("token invalide");
+            var send = {
+                status: 202,
+                message: "Accés refusé",
+                data: []
+            };
+            res.json(send);
+            return;
+        }    
+
+        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+        if(!denied2){
+            console.log("token invalide");
+            var send = {
+                status: 201,
+                message: "Choix resto",
+                data: []
+            };
+            res.json(send);
+            return;
+        }   
+        console.log("token valide");
+        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});
+        const cursor = await Plat.findOne(
+            {
+                _id: mongoose.Types.ObjectId(req.params.id)
+            })
+        .then(results => {
+            console.log(results);            
+            var send = {
+                status: 200,
+                message: "success",
+                data: results,
+                dataform: dataform
+            };
+            res.json(send);
+        })
+        .catch(error => console.error(error))            
+    });      
+  
+    /****CRUD PLAT END */   
+
+
+/****CRUD CATEGORIE PLAT START */
+                    ////***TEMPLATE DELETE */
+                    app.delete(prefixResto+'/categorieplat/:restoid/:id', async (req, res) =>{
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");        
+                        console.log(req.params.id);
+                        await CategoriePlat.findByIdAndDelete(
+                            req.params.id
+                        )
+                        .then(result => {
+                            console.log(result);
+                            console.log("categorieplat delete");
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: []
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))
+                    });
+                ////***TEMPLATE UPDATE */
+                    app.put(prefixResto+'/categorieplat/update/:restoid', async (req, res) =>{
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        console.log(req.body.id);
+                        console.log(req.body.libelle);
+                        await CategoriePlat.findByIdAndUpdate(req.body.id, 
+                            {        libelle : req.body.libelle,
+                                     createur : mongoose.Types.ObjectId(req.params.restoid)        
+                              })
+                            .then(results =>{
+                                console.log(results);
+                                console.log("categorieplat modifier");
+                                var send = {
+                                    status: 200,
+                                    message: "success",
+                                    data: []
+                                };
+                                res.json(send);
+                            })
+                            .catch(console.error);
+                    });    
+                
+                    ////***TEMPLATE CREATE */
+                    app.post(prefixResto+'/categorieplat/create/:restoid', async (req, res) => {
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        var newCategoriePlat = new CategoriePlat();
+                        newCategoriePlat.libelle = req.body.libelle;        
+                        newCategoriePlat.createur = mongoose.Types.ObjectId(req.params.restoid);        
+                
+                
+                        await newCategoriePlat.save()
+                        .then(result =>{
+                            console.log(result);
+                            console.log("categorieplat enregistrer");
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: result
+                            };
+                            res.json(send);
+                        })
+                        .catch(console.error);
+                    });       
+                
+                    ////***TEMPLATE FINDALL INI */
+                    app.get(prefixResto+'/get-categorieplats/:restoid', async (req, res) =>{                                
+                        var p = 1;
+                        var orderby = "libelle";
+                        var order = 1;
+                        /*if((req.params.page != null)){
+                            p = req.params.page;
+                        }
+                        if((req.params.orderby != null)){
+                            orderby = req.params.orderby;
+                        }
+                        if((req.params.order != null)){
+                            order = parseInt(req.params.order);
+                        }      */          
+                        console.log(p);
+                        const options = {
+                            page: p,
+                            limit: nbPageUser,
+                          };
+                console.log(options);
+                        console.log('Auth '+req.header('authorization'));                                                
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        console.log("token valide");
+                        const orderBy = {};
+                        orderBy[orderby] = order;
+                        var cursor = CategoriePlat.aggregate([
+                            {
+                                $match: {createur: mongoose.Types.ObjectId(req.params.restoid)}
+                            },                            
+                            {
+                                $sort: orderBy
+                            }
+                        ]);
+                        //cursor.match({nom: "Rakoto"});
+                        CategoriePlat.aggregatePaginate(cursor, options)
+                        .then(results => {
+                            results['sortBy'] = orderby;
+                            results['order'] = order;
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))            
+                    });   
+                
+                    ////***TEMPLATE SEARCH LIST */
+                    app.post(prefixResto+'/search-categorieplats/:restoid/:page?/:orderby?/:order?', async (req, res) =>{        
+                        
+  
+                        var p = 1;
+                        var orderby = "libelle";
+                        var order = 1;
+                        var critere = {};
+                        if(req.body.libelle!=null && req.body.libelle !== "") critere["libelle"] = {}, critere["libelle"]["$regex"] = req.body.libelle, critere["libelle"]["$options"] = "i";
+                        critere["createur"] = mongoose.Types.ObjectId(req.params.restoid);
+                        
+                        console.log(critere);
+                
+                        if((req.params.page != null)){
+                            p = req.params.page;
+                        }
+                        if((req.params.orderby != null)){
+                            orderby = req.params.orderby;
+                        }
+                        if((req.params.order != null)){
+                            order = parseInt(req.params.order);
+                        }                
+                        console.log(p);
+                        const options = {
+                            page: p,
+                            limit: nbPageUser,
+                          };
+                console.log(options);
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        const orderBy = {};
+                        orderBy[orderby] = order;
+                        var cursor = CategoriePlat.aggregate([
+                            {
+                                $match: critere
+                            },
+                            {
+                                $sort: orderBy
+                            }
+                        ]);
+                        //cursor.match({nom: "Rakoto"});
+                        CategoriePlat.aggregatePaginate(cursor, options)
+                        .then(results => {
+                            results['sortBy'] = orderby;
+                            results['order'] = order;
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))            
+                    });    
+                 
+                    ////***TEMPLATE FICHE FINDBYID */
+                    app.get(prefixResto+'/get-categorieplat/:restoid/:id', async (req, res) =>{        
+                        console.log('Auth '+req.header('authorization'));
+                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+                        console.log(denied);
+                        if(!denied){
+                            console.log("token invalide");
+                            var send = {
+                                status: 202,
+                                message: "Accés refusé",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }    
+
+                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                        if(!denied2){
+                            console.log("token invalide");
+                            var send = {
+                                status: 201,
+                                message: "Choix resto",
+                                data: []
+                            };
+                            res.json(send);
+                            return;
+                        }   
+                        console.log("token valide");
+                        const cursor = await CategoriePlat.find(
+                            {
+                                _id: mongoose.Types.ObjectId(req.params.id)
+                            })
+                        .then(results => {
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))            
+                    });       
+  
+    ////***TEMPLATE PAGE UPDATE SI DATAFORM */
+    app.get(prefixResto+'/categorieplat/update/:restoid/:id', async (req, res) =>{        
+        console.log('Auth '+req.header('authorization'));
+        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+        console.log(denied);
+        if(!denied){
+            console.log("token invalide");
+            var send = {
+                status: 202,
+                message: "Accés refusé",
+                data: []
+            };
+            res.json(send);
+            return;
+        }    
+
+        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+        if(!denied2){
+            console.log("token invalide");
+            var send = {
+                status: 201,
+                message: "Choix resto",
+                data: []
+            };
+            res.json(send);
+            return;
+        }   
+        console.log("token valide");
+        const cursor = await CategoriePlat.findOne(
+            {
+                _id: mongoose.Types.ObjectId(req.params.id)
+            })
+        .then(results => {
+            console.log(results);            
+            var send = {
+                status: 200,
+                message: "success",
+                data: results
+            };
+            res.json(send);
+        })
+        .catch(error => console.error(error))            
+    });      
+  
+    /****CRUD CATEGORIE PLAT END */    
+  
+    
+  
+  
+
+
+    ////////////*****RESTO END */
+    
+    
     //**************BACK OFFICE START***************///
 
 
@@ -46,7 +976,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE DELETE */
                     app.delete(prefixBackOffice+'/ville/:id', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -79,7 +1009,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                 ////***TEMPLATE UPDATE */
                     app.put(prefixBackOffice+'/ville/update', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -113,7 +1043,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE CREATE */
                     app.post(prefixBackOffice+'/ville/create', async (req, res) => {
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                         
                         console.log(denied);
                         if(!denied){
@@ -166,7 +1096,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -231,7 +1161,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -274,7 +1204,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE FICHE FINDBYID */
                     app.get(prefixBackOffice+'/get-ville/:id', async (req, res) =>{        
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -307,7 +1237,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
     ////***TEMPLATE PAGE UPDATE SI DATAFORM */
     app.get(prefixBackOffice+'/ville/update/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -344,7 +1274,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE DELETE */
                     app.delete(prefixBackOffice+'/role/:id', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -377,7 +1307,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                 ////***TEMPLATE UPDATE */
                     app.put(prefixBackOffice+'/role/update', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -413,7 +1343,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE CREATE */
                     app.post(prefixBackOffice+'/role/create', async (req, res) => {
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                         
                         console.log(denied);
                         if(!denied){
@@ -467,7 +1397,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -532,7 +1462,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -575,7 +1505,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE FICHE FINDBYID */
                     app.get(prefixBackOffice+'/get-role/:id', async (req, res) =>{        
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -608,7 +1538,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
     ////***TEMPLATE PAGE UPDATE SI DATAFORM */
     app.get(prefixBackOffice+'/role/update/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -645,7 +1575,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                 ////***TEMPLATE REMOVE FROM ARRAY */
                 app.put(prefixBackOffice+'/resto/removeuser', async (req, res) =>{
                     console.log('Auth '+req.header('authorization'));
-                    var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                    var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
             
                     console.log(denied);
                     if(!denied){
@@ -686,7 +1616,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE DELETE */
                     app.delete(prefixBackOffice+'/resto/:id', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -719,7 +1649,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                 ////***TEMPLATE UPDATE */
                     app.put(prefixBackOffice+'/resto/update', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -768,7 +1698,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE CREATE */
                     app.post(prefixBackOffice+'/resto/create', async (req, res) => {
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                         
                         console.log(denied);
                         if(!denied){
@@ -824,7 +1754,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -901,7 +1831,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -954,7 +1884,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE FICHE FINDBYID */
                     app.get(prefixBackOffice+'/get-resto/:id', async (req, res) =>{        
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -1010,7 +1940,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
     ////***TEMPLATE PAGE CREATE SI DATAFORM */
     app.get(prefixBackOffice+'/resto/create', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1036,7 +1966,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
     ////***TEMPLATE PAGE UPDATE SI DATAFORM */
     app.get(prefixBackOffice+'/resto/update/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1089,7 +2019,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
                     ////***TEMPLATE DELETE */
     app.delete(prefixBackOffice+'/user/:id', async (req, res) =>{
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1122,7 +2052,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
 ////***TEMPLATE UPDATE */
     app.put(prefixBackOffice+'/user/update', async (req, res) =>{
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1161,7 +2091,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, serverA
     ////***TEMPLATE CREATE */
     app.post(prefixBackOffice+'/user/create', async (req, res) => {
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
         
         console.log(denied);
         if(!denied){
@@ -1222,7 +2152,7 @@ console.log(newUser);
           };
 console.log(options);
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1311,7 +2241,7 @@ console.log(options);
           };
 console.log(options);
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1372,7 +2302,7 @@ console.log(options);
     ////***TEMPLATE FICHE FINDBYID */
     app.get(prefixBackOffice+'/get-user/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1425,7 +2355,7 @@ console.log(options);
     ////***TEMPLATE PAGE UPDATE SI DATAFORM */
     app.get(prefixBackOffice+'/user/update/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1482,7 +2412,7 @@ console.log(options);
     ////***TEMPLATE PAGE CREATE SI DATAFORM */
     app.get(prefixBackOffice+'/user/create', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), [1, 2, 3]);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
 
         console.log(denied);
         if(!denied){
@@ -1510,6 +2440,7 @@ console.log(options);
                 //**LOG BACK START*/
                 app.post(prefixBackOffice+'/login', (req, res) => {
                     console.log(req.body.email +"/"+req.body.mdp);
+                    console.log("ORIGIN: "+req.body.origin);
                     Users.findOne({
                         $and:[
                             {
@@ -1525,7 +2456,7 @@ console.log(options);
                         console.log(result);
                         console.log(result.id);
                         var token = service.createToken(result);
-                        service.saveToken(result, token);
+                        service.saveToken(result, token, req.body.origin);
                         var send = {
                             status: 200,
                             message: "success",
@@ -1537,9 +2468,9 @@ console.log(options);
                     .catch(error => console.error(error))    
                 });
 
-    app.get(prefixBackOffice+'/signout', async (req, res) =>{        
+    app.get(prefixBackOffice+'/signout/:origin', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuth(req.header('authorization'), []);
+        var denied = await service.checkAuth(req.header('authorization'), [], req.params.origin);
 
         console.log(denied);
         if(!denied){

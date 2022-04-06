@@ -20,7 +20,8 @@ const sessionSchema = new mongoose.Schema({
     user: mongoose.Schema.Types.ObjectId,
     valeur: String,
     daty: Date,
-    etat: Number
+    etat: Number,
+    origin: Number
 });
 
 const villeSchema = new mongoose.Schema({
@@ -47,10 +48,30 @@ const restoSchema = new mongoose.Schema({
 
 restoSchema.plugin(aggregatePaginate);
 
+const categoriePlatSchema = new mongoose.Schema({
+    libelle: String,
+    createur: mongoose.Schema.Types.ObjectId
+});
+
+categoriePlatSchema.plugin(aggregatePaginate);
+
+const platSchema = new mongoose.Schema({ 
+    libelle: String,
+    categorie: mongoose.Schema.Types.ObjectId,
+    createur: mongoose.Schema.Types.ObjectId,
+    description: String,
+    recette: String,
+    images:[]
+});
+
+platSchema.plugin(aggregatePaginate);
+
 const Users = new mongoose.model('users', userSchema);
 const Session = new mongoose.model('sessions', sessionSchema);
 const Ville = new mongoose.model('villes', villeSchema);
 const Role = new mongoose.model('roles', roleSchema);
 const Resto = new mongoose.model('restos', restoSchema);
+const CategoriePlat = new mongoose.model('categoriePlats', categoriePlatSchema);
+const Plat = new mongoose.model('plats', platSchema);
   
-module.exports = { Users, Session, Ville, Role, Resto};
+module.exports = { Users, Session, Ville, Role, Resto, CategoriePlat, Plat};

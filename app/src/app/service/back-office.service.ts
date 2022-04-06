@@ -15,13 +15,13 @@ export class BackOfficeService {
     return this.http.post(this.nomdomaine+this.prefix+"/login", user);
   }
   
-  logout(){
+  logout(origin: any){
     console.log(localStorage.getItem('token'));
     const header = new HttpHeaders({
       'Authorization': localStorage.getItem('token')
     });    
     console.log(header);
-    var c = this.nomdomaine+this.prefix+'/signout';    
+    var c = this.nomdomaine+this.prefix+'/signout/'+origin;    
     return this.http.get(c, {
       headers: header,
       //withCredentials: true
