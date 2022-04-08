@@ -3,6 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RestoService } from '../../../service/resto.service';
 import { WINDOW } from '../../../window.providers';
 import { NgxSpinnerService } from "ngx-spinner";
+import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {NgForm} from '@angular/forms';
+import { UploadServiceService } from '../../../upload-service.service';
 
 @Component({
   selector: 'app-fiche-plat',
@@ -14,7 +18,7 @@ export class FichePlatComponent implements OnInit {
   id: String;
   plat: any;
   domainename= this.window.location.hostname;
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: RestoService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: RestoService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService, private http: HttpClient, private uploadService: UploadServiceService) { }
   
   ngOnInit(): void {
     this.spinner.show();
@@ -27,6 +31,8 @@ export class FichePlatComponent implements OnInit {
        }
        else if(data['status'] === 202){
         this.router.navigate(['/access-admin/resto']);  
+       }else if(data['status'] === 201){
+        this.router.navigate(['/access-admin/resto/choose']);  
        }else{
         
        }     
@@ -48,6 +54,8 @@ export class FichePlatComponent implements OnInit {
        }
        else if(data['status'] === 202){
         this.router.navigate(['/access-admin/resto']);  
+       }else if(data['status'] === 201){
+        this.router.navigate(['/access-admin/resto/choose']);  
        }else{
         
        }       
@@ -60,7 +68,16 @@ export class FichePlatComponent implements OnInit {
      });       
   }
   
-
-
+  updateImage(form: NgForm) {
+    this.spinner.show();
+    console.log(form.value);
+    this.uploadService.uploadImage(form.value).subscribe((data) => {      
+      console.log(data);
+      if(data != null){
+        
+      }
+                this.spinner.hide();
+    })
+}
 
 }

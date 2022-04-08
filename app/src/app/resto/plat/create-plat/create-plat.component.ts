@@ -24,6 +24,8 @@ export class CreatePlatComponent implements OnInit {
        }
        else if(data['status'] === 202){
         this.router.navigate(['/access-admin/resto']);  
+       }else if(data['status'] === 201){
+        this.router.navigate(['/access-admin/resto/choose']);  
        }else{
         
        }       
@@ -46,6 +48,8 @@ export class CreatePlatComponent implements OnInit {
        }
        else if(data['status'] === 202){
         this.router.navigate(['/access-admin/resto']);  
+       }else if(data['status'] === 201){
+        this.router.navigate(['/access-admin/resto/choose']);  
        }else{
         
        }    

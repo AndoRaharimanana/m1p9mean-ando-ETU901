@@ -34,10 +34,10 @@ import { ListVilleComponent } from './e-kaly/ville/list-ville/list-ville.compone
 import { CreateVilleComponent } from './e-kaly/ville/create-ville/create-ville.component';
 import { FicheVilleComponent } from './e-kaly/ville/fiche-ville/fiche-ville.component';
 import { UpdateVilleComponent } from './e-kaly/ville/update-ville/update-ville.component';
-import { ListCategoriePlatComponent } from './resto/categorie/list-categorie-plat/list-categorie-plat.component';
-import { FicheCategoriePlatComponent } from './resto/categorie/fiche-categorie-plat/fiche-categorie-plat.component';
-import { CreateCategoriePlatComponent } from './resto/categorie/create-categorie-plat/create-categorie-plat.component';
-import { UpdateCategoriePlatComponent } from './resto/categorie/update-categorie-plat/update-categorie-plat.component';
+import { ListCategoriePlatComponent } from './e-kaly/categorie/list-categorie-plat/list-categorie-plat.component';
+import { FicheCategoriePlatComponent } from './e-kaly/categorie/fiche-categorie-plat/fiche-categorie-plat.component';
+import { CreateCategoriePlatComponent } from './e-kaly/categorie/create-categorie-plat/create-categorie-plat.component';
+import { UpdateCategoriePlatComponent } from './e-kaly/categorie/update-categorie-plat/update-categorie-plat.component';
 import { RestoLoginComponent } from './resto/form/resto-login/resto-login.component';
 import { HeaderRestoComponent } from './resto/header/header-resto/header-resto.component';
 import { ChooseComponent } from './resto/choose/choose.component';
@@ -45,6 +45,8 @@ import { ListPlatComponent } from './resto/plat/list-plat/list-plat.component';
 import { FichePlatComponent } from './resto/plat/fiche-plat/fiche-plat.component';
 import { CreatePlatComponent } from './resto/plat/create-plat/create-plat.component';
 import { UpdatePlatComponent } from './resto/plat/update-plat/update-plat.component';
+import { PagePlatComponent } from './client/page-plat/page-plat.component';
+import { PageRestoComponent } from './client/page-resto/page-resto.component';
 
 
 @NgModule({
@@ -83,7 +85,9 @@ import { UpdatePlatComponent } from './resto/plat/update-plat/update-plat.compon
     ListPlatComponent,
     FichePlatComponent,
     CreatePlatComponent,
-    UpdatePlatComponent
+    UpdatePlatComponent,
+    PagePlatComponent,
+    PageRestoComponent
   ],
   imports: [
     BrowserModule,

@@ -49,8 +49,7 @@ const restoSchema = new mongoose.Schema({
 restoSchema.plugin(aggregatePaginate);
 
 const categoriePlatSchema = new mongoose.Schema({
-    libelle: String,
-    createur: mongoose.Schema.Types.ObjectId
+    libelle: String
 });
 
 categoriePlatSchema.plugin(aggregatePaginate);

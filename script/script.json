@@ -11,18 +11,20 @@ db.villes.insertMany([
 	{"libelle": "Analakely"},
 	{"libelle": "Ivato"}
 	]);	
-		
+	
+{"_id":{"$oid":"624b61a16adeb4542a6eb5f9"},"libelle":"Analakely"}	
+{"_id":{"$oid":"624b62856adeb4542a6effd9"},"libelle":"super-utilisateur","valeur":{"$numberInt":"10"}}
 
 db.users.insert(
-	{"nom": "Rakoto",
-	"prenom":"Jean",
-	"email": "rakoto@mail.com",
+	{"nom": "admin",
+	"prenom":"admin",
+	"email": "admin@ekaly.com",
 	"contact": "0342050010",
 	"adresse": "Andoharanofotsy",
-	"ville": ObjectId("62486e5eb51e6994ffaea350"),
-	"mdp": "123456",
+	"ville": ObjectId("624b61a16adeb4542a6eb5f9"),
+	"mdp": "21232f297a57a5a743894a0e4a801fc3",
 	"sexe": "homme",
-	"role": ObjectId("62486e4eb51e6994ffaea34b")
+	"role": ObjectId("624b62856adeb4542a6effd9")
 	}
 	);
 	
@@ -169,25 +171,144 @@ db.sessions.find().pretty();
 			}	
 		},
 		{
-
-			$filter:{
-				role:{$eq: 10}
-			}
-		}
-	]
-	).pretty();
-	,
-		{
-
-		},
-		{
-			$project:{
-				role: {
-					$filter:{
-						input: "$role",
-						as: "role",
-						cond: {$eq: ["$$role.valeur", 10]}
+			$match:{
+				role:{
+					$elemMatch:{
+						valeur: 10,
 					}
 				}
 			}
 		}
+	]
+	).pretty();
+
+	db.restos.aggregate([		
+		{
+			$lookup:{
+				from: "users",
+				localField: "users.user",
+				foreignField: "_id",
+				as: "users"
+			}	
+		},
+		{
+			$group:{
+				_id: '$users._id', count:{$sum: 1}
+			}
+		}
+	]
+	).pretty();	
+
+	db.users.aggregate([
+		{
+			$lookup:{
+				from: "restos",
+				localField: "_id",
+				foreignField: "users.user",
+				as: "restos"
+			}
+		},
+		{
+			$match:{
+				restos:{
+					$eq: []
+				}
+			}
+		}
+	]
+	).pretty();	
+
+
+		db.sessions.aggregate([
+			{
+				$match:{
+					valeur: "0fa0794a03213c1acc6b9d07d78f0b31"
+				}
+			},
+			{
+				$lookup:{
+					from: "restos",
+					localField: "user",
+					foreignField: "users.user",
+					as: "restos"
+				}
+			},
+			{
+				$match:{
+					restos:{
+						$ne: []
+					}
+				}
+			}
+		]).pretty()
+
+
+
+		db.plats.find().pretty();
+		db.restos.find().pretty();
+
+		db.restos.update(
+			{"_id": ObjectId("6249dd1638279f91f693afa6")},
+			{
+				"$push":{
+					plats:{
+						plat: ObjectId("6250786ab56ec6df668a4566"),
+						daty: new Date(2022, 3, 7, 10, 30),
+						prix: 5200,
+						etat: 0
+					}
+				}
+			}
+			)
+
+
+db.restos.aggregate([
+	{
+		$unwind: "$plats"
+	},
+	{
+		$group:{
+			_id:
+				"$plats"
+		}
+	},
+	{
+		$match:{
+			"_id.daty":{
+				$lte: new Date(2022, 04, 07, 23, 00)
+			}
+		}
+	},
+	{
+		$sort:{
+			"_id.daty": -1
+		}
+	},
+	{
+		$group:{
+			_id: "$_id.plat",
+			doc: {
+				$first: '$$ROOT'
+			}
+		},
+	},
+	{
+		"$replaceRoot": {
+			"newRoot": "$doc"
+		}
+	}]).pretty(),
+	{
+		$project:{
+			maxDaty:{
+				$dateToString:{
+					format: "%d/%m/%Y %H:%M:%S",
+					date: "$_id.daty"
+				}
+			}
+		}
+	}
+]).pretty()
+
+
+
+		

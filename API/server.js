@@ -47,7 +47,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }).then(
     console.log('Connected to Database Mongoose');  
 
 app.get('/page-upload-test', (req, res)=>{
-    res.writeHead(200, {'Content-Type': 'text/html'});
+    //res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('<form action="/upload-test" method="post" enctype="multipart/form-data">');
     res.write('<input type="file" name="filetoupload"><br>');
     res.write('<input type="submit">');
@@ -56,8 +56,13 @@ app.get('/page-upload-test', (req, res)=>{
 });
 
 app.post('/upload-test', (req, res) =>{
+    console.log("azy1");
     var form = new formidable.IncomingForm();
+    console.log("azy2");
     form.parse(req, function (err, fields, files) {
+        if (err) throw err;
+        console.log("azy");
+        console.log(files);
         var oldpath = files.filetoupload.filepath;
         var newpath = 'C:/Users/rahar/Documents/MEAN/' + files.filetoupload.originalFilename;
         fs.rename(oldpath, newpath, function (err) {
@@ -295,7 +300,7 @@ app.post('/upload-test', (req, res) =>{
                         console.log("token valide");
                         const orderBy = {};
                         orderBy[orderby] = order;
-                        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});                        
+                        var dataform = await service.getCategoriePlat({});                        
                         var cursor = Plat.aggregate([
                             {
                                 $match: {createur: mongoose.Types.ObjectId(req.params.restoid)}
@@ -389,7 +394,7 @@ app.post('/upload-test', (req, res) =>{
                         console.log("token valide");
                         const orderBy = {};
                         orderBy[orderby] = order;
-                        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});                        
+                        var dataform = await service.getCategoriePlat({});                        
                         var cursor = Plat.aggregate([
                             {
                                 $match: critere
@@ -428,7 +433,7 @@ app.post('/upload-test', (req, res) =>{
                     app.get(prefixResto+'/get-plat/:restoid/:id', async (req, res) =>{        
                         console.log('Auth '+req.header('authorization'));
                         var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
-                
+                        
                         console.log(denied);
                         if(!denied){
                             console.log("token invalide");
@@ -510,7 +515,7 @@ app.post('/upload-test', (req, res) =>{
             return;
         }     
         console.log("token valide");
-        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});                        
+        var dataform = await service.getCategoriePlat({});                        
         var send = {
             status: 200,
             message: "success",
@@ -550,7 +555,7 @@ app.post('/upload-test', (req, res) =>{
             return;
         }   
         console.log("token valide");
-        var dataform = await service.getCategoriePlat({createur: mongoose.Types.ObjectId(req.params.restoid)});
+        var dataform = await service.getCategoriePlat({});
         const cursor = await Plat.findOne(
             {
                 _id: mongoose.Types.ObjectId(req.params.id)
@@ -571,11 +576,19 @@ app.post('/upload-test', (req, res) =>{
     /****CRUD PLAT END */   
 
 
+  
+
+
+    ////////////*****RESTO END */
+    
+    
+    //**************BACK OFFICE START***************///
+
 /****CRUD CATEGORIE PLAT START */
                     ////***TEMPLATE DELETE */
-                    app.delete(prefixResto+'/categorieplat/:restoid/:id', async (req, res) =>{
+                    app.delete(prefixBackOffice+'/categorieplat/:id', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -588,18 +601,8 @@ app.post('/upload-test', (req, res) =>{
                             res.json(send);
                             return;
                         }    
-
-                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
-                        if(!denied2){
-                            console.log("token invalide");
-                            var send = {
-                                status: 201,
-                                message: "Choix resto",
-                                data: []
-                            };
-                            res.json(send);
-                            return;
-                        }   
+  
+  
                         console.log("token valide");        
                         console.log(req.params.id);
                         await CategoriePlat.findByIdAndDelete(
@@ -618,9 +621,9 @@ app.post('/upload-test', (req, res) =>{
                         .catch(error => console.error(error))
                     });
                 ////***TEMPLATE UPDATE */
-                    app.put(prefixResto+'/categorieplat/update/:restoid', async (req, res) =>{
+                    app.put(prefixBackOffice+'/categorieplat/update', async (req, res) =>{
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -632,25 +635,12 @@ app.post('/upload-test', (req, res) =>{
                             };
                             res.json(send);
                             return;
-                        }    
-
-                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
-                        if(!denied2){
-                            console.log("token invalide");
-                            var send = {
-                                status: 201,
-                                message: "Choix resto",
-                                data: []
-                            };
-                            res.json(send);
-                            return;
                         }   
                         console.log("token valide");
                         console.log(req.body.id);
                         console.log(req.body.libelle);
                         await CategoriePlat.findByIdAndUpdate(req.body.id, 
-                            {        libelle : req.body.libelle,
-                                     createur : mongoose.Types.ObjectId(req.params.restoid)        
+                            {        libelle : req.body.libelle
                               })
                             .then(results =>{
                                 console.log(results);
@@ -666,9 +656,9 @@ app.post('/upload-test', (req, res) =>{
                     });    
                 
                     ////***TEMPLATE CREATE */
-                    app.post(prefixResto+'/categorieplat/create/:restoid', async (req, res) => {
+                    app.post(prefixBackOffice+'/categorieplat/create', async (req, res) => {
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -681,22 +671,11 @@ app.post('/upload-test', (req, res) =>{
                             res.json(send);
                             return;
                         }    
-
-                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
-                        if(!denied2){
-                            console.log("token invalide");
-                            var send = {
-                                status: 201,
-                                message: "Choix resto",
-                                data: []
-                            };
-                            res.json(send);
-                            return;
-                        }   
+  
+  
                         console.log("token valide");
                         var newCategoriePlat = new CategoriePlat();
-                        newCategoriePlat.libelle = req.body.libelle;        
-                        newCategoriePlat.createur = mongoose.Types.ObjectId(req.params.restoid);        
+                        newCategoriePlat.libelle = req.body.libelle;                              
                 
                 
                         await newCategoriePlat.save()
@@ -714,7 +693,7 @@ app.post('/upload-test', (req, res) =>{
                     });       
                 
                     ////***TEMPLATE FINDALL INI */
-                    app.get(prefixResto+'/get-categorieplats/:restoid', async (req, res) =>{                                
+                    app.get(prefixBackOffice+'/get-categorieplats', async (req, res) =>{                                
                         var p = 1;
                         var orderby = "libelle";
                         var order = 1;
@@ -734,7 +713,7 @@ app.post('/upload-test', (req, res) =>{
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));                                                
-                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -747,26 +726,13 @@ app.post('/upload-test', (req, res) =>{
                             res.json(send);
                             return;
                         }    
-
-                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
-                        if(!denied2){
-                            console.log("token invalide");
-                            var send = {
-                                status: 201,
-                                message: "Choix resto",
-                                data: []
-                            };
-                            res.json(send);
-                            return;
-                        }    
-
+  
+   
+  
                         console.log("token valide");
                         const orderBy = {};
                         orderBy[orderby] = order;
-                        var cursor = CategoriePlat.aggregate([
-                            {
-                                $match: {createur: mongoose.Types.ObjectId(req.params.restoid)}
-                            },                            
+                        var cursor = CategoriePlat.aggregate([                 
                             {
                                 $sort: orderBy
                             }
@@ -788,15 +754,14 @@ app.post('/upload-test', (req, res) =>{
                     });   
                 
                     ////***TEMPLATE SEARCH LIST */
-                    app.post(prefixResto+'/search-categorieplats/:restoid/:page?/:orderby?/:order?', async (req, res) =>{        
+                    app.post(prefixBackOffice+'/search-categorieplats/:page?/:orderby?/:order?', async (req, res) =>{        
                         
   
                         var p = 1;
                         var orderby = "libelle";
                         var order = 1;
                         var critere = {};
-                        if(req.body.libelle!=null && req.body.libelle !== "") critere["libelle"] = {}, critere["libelle"]["$regex"] = req.body.libelle, critere["libelle"]["$options"] = "i";
-                        critere["createur"] = mongoose.Types.ObjectId(req.params.restoid);
+                        if(req.body.libelle!=null && req.body.libelle !== "") critere["libelle"] = {}, critere["libelle"]["$regex"] = req.body.libelle, critere["libelle"]["$options"] = "i";                      
                         
                         console.log(critere);
                 
@@ -816,7 +781,7 @@ app.post('/upload-test', (req, res) =>{
                           };
                 console.log(options);
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -829,18 +794,8 @@ app.post('/upload-test', (req, res) =>{
                             res.json(send);
                             return;
                         }    
-
-                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
-                        if(!denied2){
-                            console.log("token invalide");
-                            var send = {
-                                status: 201,
-                                message: "Choix resto",
-                                data: []
-                            };
-                            res.json(send);
-                            return;
-                        }   
+  
+  
                         console.log("token valide");
                         const orderBy = {};
                         orderBy[orderby] = order;
@@ -869,9 +824,9 @@ app.post('/upload-test', (req, res) =>{
                     });    
                  
                     ////***TEMPLATE FICHE FINDBYID */
-                    app.get(prefixResto+'/get-categorieplat/:restoid/:id', async (req, res) =>{        
+                    app.get(prefixBackOffice+'/get-categorieplat/:id', async (req, res) =>{        
                         console.log('Auth '+req.header('authorization'));
-                        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
                         console.log(denied);
                         if(!denied){
@@ -884,18 +839,8 @@ app.post('/upload-test', (req, res) =>{
                             res.json(send);
                             return;
                         }    
-
-                        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
-                        if(!denied2){
-                            console.log("token invalide");
-                            var send = {
-                                status: 201,
-                                message: "Choix resto",
-                                data: []
-                            };
-                            res.json(send);
-                            return;
-                        }   
+  
+  
                         console.log("token valide");
                         const cursor = await CategoriePlat.find(
                             {
@@ -914,9 +859,9 @@ app.post('/upload-test', (req, res) =>{
                     });       
   
     ////***TEMPLATE PAGE UPDATE SI DATAFORM */
-    app.get(prefixResto+'/categorieplat/update/:restoid/:id', async (req, res) =>{        
+    app.get(prefixBackOffice+'/categorieplat/update/:id', async (req, res) =>{        
         console.log('Auth '+req.header('authorization'));
-        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+        var denied = await service.checkAuth(req.header('authorization'), access_backoffice, 1);
                 
         console.log(denied);
         if(!denied){
@@ -929,18 +874,8 @@ app.post('/upload-test', (req, res) =>{
             res.json(send);
             return;
         }    
-
-        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
-        if(!denied2){
-            console.log("token invalide");
-            var send = {
-                status: 201,
-                message: "Choix resto",
-                data: []
-            };
-            res.json(send);
-            return;
-        }   
+  
+        
         console.log("token valide");
         const cursor = await CategoriePlat.findOne(
             {
@@ -963,12 +898,9 @@ app.post('/upload-test', (req, res) =>{
     
   
   
-
-
-    ////////////*****RESTO END */
     
-    
-    //**************BACK OFFICE START***************///
+  
+  
 
 
 ////****CRUD VILLE START */    

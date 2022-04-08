@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RestoService } from '../../../service/resto.service';
+import { BackOfficeService } from '../../../service/back-office.service';
 import { WINDOW } from '../../../window.providers';
 import { NgxSpinnerService } from "ngx-spinner";
 
@@ -14,7 +14,7 @@ export class FicheCategoriePlatComponent implements OnInit {
   id: String;
   categorieplat: any;
   domainename= this.window.location.hostname;
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: RestoService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
   
   ngOnInit(): void {
     this.spinner.show();
@@ -26,7 +26,7 @@ export class FicheCategoriePlatComponent implements OnInit {
         this.categorieplat = data['data'][0];            
        }
        else if(data['status'] === 202){
-        this.router.navigate(['/access-admin/resto']);  
+        this.router.navigate(['/access-admin']);  
        }else{
         
        }     
@@ -34,7 +34,7 @@ export class FicheCategoriePlatComponent implements OnInit {
      },
      err => {
        console.log("errorr");
-       this.router.navigate(['/access-admin/resto']);  
+       this.router.navigate(['/access-admin']);  
        this.spinner.hide(); 
      });           
   }
@@ -44,10 +44,10 @@ export class FicheCategoriePlatComponent implements OnInit {
       console.log(data);
        console.log('ici =='+data['status']);
        if(data['status'] === 200){
-        this.router.navigate(['/access-admin/resto/list-categorieplats']);  
+        this.router.navigate(['/access-admin/auth/list-categorieplats']);  
        }
        else if(data['status'] === 202){
-        this.router.navigate(['/access-admin/resto']);  
+        this.router.navigate(['/access-admin']);  
        }else{
         
        }       
@@ -55,7 +55,7 @@ export class FicheCategoriePlatComponent implements OnInit {
      },
      err => {
        console.log("errorr");
-       this.router.navigate(['/access-admin/resto']);  
+       this.router.navigate(['/access-admin']);  
        this.spinner.hide(); 
      });       
   }

@@ -43,7 +43,7 @@ export class ChooseComponent implements OnInit {
     resto['id'] = id;
     resto['nom'] = nom;
     localStorage.setItem("resto", JSON.stringify(resto));
-    this.router.navigate(['/access-admin/resto/list-categorieplats']);  
+    this.router.navigate(['/access-admin/resto/list-plats']);  
   }
 
 }

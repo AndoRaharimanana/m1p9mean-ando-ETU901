@@ -466,6 +466,119 @@ getUpdateVille(id) {
 
 /////CRUD VILLE END//
 
+
+
+//////CRUD CATEGORIE PLAT START////
+
+
+
+/////TEMPLATE FINDALL
+getCategorieplats() {
+
+  console.log(localStorage.getItem('token'));
+  const header = new HttpHeaders({
+    'Authorization': localStorage.getItem('token')
+  });    
+  console.log(header);
+  var c = this.nomdomaine+this.prefix+'/get-categorieplats';    
+  return this.http.get(c, {
+    headers: header,
+    //withCredentials: true
+  });
+}
+
+
+/////TEMPLATE RECHERCHE
+searchCategorieplats(page: String, type: String, order: String, critere: any) {
+
+  console.log(localStorage.getItem('token'));
+  const header = new HttpHeaders({
+    'Authorization': localStorage.getItem('token')
+  });    
+  console.log(header);
+  var c = this.nomdomaine+this.prefix+'/search-categorieplats/'+page+'/'+type+'/'+order;    
+  return this.http.post(c, critere,  {
+    headers: header,
+    //withCredentials: true
+  });
+}  
+
+
+/////TEMPLATE CREATE
+createCategorieplat(categorieplat:any){
+
+  const header = new HttpHeaders({
+    'Authorization': localStorage.getItem('token')
+  });  
+  return this.http.post(this.nomdomaine+this.prefix+"/categorieplat/create", categorieplat, {
+    headers: header,
+    //withCredentials: true
+  });      
+}
+
+  /////TEMPLATE  UPDATE
+  updateCategorieplat(categorieplat:any){
+
+    const header = new HttpHeaders({
+      'Authorization': localStorage.getItem('token')
+    });  
+    return this.http.put(this.nomdomaine+this.prefix+"/categorieplat/update", categorieplat, {
+      headers: header,
+      //withCredentials: true
+    });      
+  }
+  
+  /////TEMPLATE DELETE
+  deleteCategorieplat(id) {
+
+    console.log(localStorage.getItem('token'));
+    const header = new HttpHeaders({
+      'Authorization': localStorage.getItem('token')
+    });    
+    console.log(header);
+    var c = this.nomdomaine+this.prefix+'/categorieplat/'+id;    
+    return this.http.delete(c, {
+      headers: header,
+      //withCredentials: true
+    });
+  }  
+
+/////TEMPLATE FICHE
+getCategorieplat(id) {
+
+  console.log(localStorage.getItem('token'));
+  const header = new HttpHeaders({
+    'Authorization': localStorage.getItem('token')
+  });    
+  console.log(header);
+  var c = this.nomdomaine+this.prefix+'/get-categorieplat/'+id;    
+  return this.http.get(c, {
+    headers: header,
+    //withCredentials: true
+  });
+}  
+
+/////TEMPLATE DATA FROM UPDATE
+getUpdateCategorieplat(id) {
+
+  console.log(localStorage.getItem('token'));
+  const header = new HttpHeaders({
+    'Authorization': localStorage.getItem('token')
+  });    
+  console.log(header);
+  var c = this.nomdomaine+this.prefix+'/categorieplat/update/'+id;    
+  return this.http.get(c, {
+    headers: header,
+    //withCredentials: true
+  });
+}  
+
+
+
+/////CRUD CATEGORIEPLAT END//  
+
+
+/////CRUD CATEGORIE PLAT END///////
 }
 /*getUsers_(page: String) {
     console.log(localStorage.getItem('token'));

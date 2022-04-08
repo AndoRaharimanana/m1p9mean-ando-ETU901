@@ -68,8 +68,10 @@ export class ListPlatComponent implements OnInit {
        }
        else if(data['status'] === 202){
         this.router.navigate(['/access-admin/resto']);  
+        return;
        }else if(data['status'] === 201){
         this.router.navigate(['/access-admin/resto/choose']);  
+        return;
        }
        else{
         
@@ -79,6 +81,7 @@ export class ListPlatComponent implements OnInit {
      err => {
        console.log("errorr");
        this.router.navigate(['/access-admin']);  
+       return;
        this.spinner.hide(); 
      });     
   }
@@ -95,7 +98,9 @@ export class ListPlatComponent implements OnInit {
         this.router.navigate(['/access-admin/resto/list-plats']);  
        }
        else if(data['status'] === 202){
-        this.router.navigate(['/access-admin']);  
+        this.router.navigate(['/access-admin/resto']);  
+       }else if(data['status'] === 201){
+        this.router.navigate(['/access-admin/resto/choose']);  
        }else{
         
        }   
@@ -139,7 +144,9 @@ export class ListPlatComponent implements OnInit {
         }
        }
        else if(data['status'] === 202){
-        this.router.navigate(['/access-admin']);  
+        this.router.navigate(['/access-admin/resto']);  
+       }else if(data['status'] === 201){
+        this.router.navigate(['/access-admin/resto/choose']);  
        }else{
         
        }    
@@ -147,7 +154,7 @@ export class ListPlatComponent implements OnInit {
      },
      err => {
        console.log(err);
-       this.router.navigate(['/access-admin']);  
+       this.router.navigate(['/access-admin/resto']);  
        this.spinner.hide(); 
      });           
   }  

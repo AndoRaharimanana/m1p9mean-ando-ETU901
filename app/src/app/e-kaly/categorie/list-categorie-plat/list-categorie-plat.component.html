@@ -1,4 +1,4 @@
-<app-header-resto></app-header-resto>
+<app-header-e-kaly></app-header-e-kaly>
 <h1 style="text-align: center">Gestion catégorie plat</h1>
 <div class="mt-5 md:mt-0 md:col-span-2">
 <form #myform = "ngForm" (ngSubmit) = "onSubmit('1', sortBy, order.toString(), myform)" class="mt-8 space-y-6">
@@ -22,7 +22,7 @@
 </div>
 
 
-<a href="/access-admin/resto/create-categorieplats"><button style="margin: 1% 2%" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Nouvelle catégorie plat +</button></a>
+<a href="/access-admin/auth/create-categorieplats"><button style="margin: 1% 2%" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Nouvelle catégorie plat +</button></a>
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -39,12 +39,12 @@
     <tbody>
     <tr *ngFor="let categorieplat of categorieplats" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
     <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-    <a href="/access-admin/resto/fiche-categorieplats/{{categorieplat._id}}">{{categorieplat.libelle}}</a>
+    <a href="/access-admin/auth/fiche-categorieplats/{{categorieplat._id}}">{{categorieplat.libelle}}</a>
     </th>
     <td class="px-6 py-4 text-right">
 
         <div class="inline-flex rounded-md shadow-sm" categorieplat="group">
-            <a href="/access-admin/resto/update-categorieplats/{{categorieplat._id}}"><button type="button" class="btn btn-yellow py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
+            <a href="/access-admin/auth/update-categorieplats/{{categorieplat._id}}"><button type="button" class="btn btn-yellow py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
                 <fa-icon [icon]="faPencil"></fa-icon>
             </button></a>
             <button (click)="deleteCategorieplat(categorieplat._id)" type="button" class="btn btn-red py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
@@ -69,7 +69,7 @@
       </div>
       <div>
         <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-          <button *ngIf="hasPrevPage === true" (click)="onSubmit(prevPage, sortBy, orderCurrent.toString(), myform)" type="button" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"> <!--href="{{domainename}}/access-admin/resto/list-categorieplats/{{prevPage}}"-->
+          <button *ngIf="hasPrevPage === true" (click)="onSubmit(prevPage, sortBy, orderCurrent.toString(), myform)" type="button" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"> <!--href="{{domainename}}/access-admin/auth/list-categorieplats/{{prevPage}}"-->
             <span class="sr-only">Previous</span>
             <!-- Heroicon name: solid/chevron-left -->
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -77,8 +77,8 @@
             </svg>
           </button>
           <!-- Current: "z-10 bg-indigo-50 border-indigo-500 text-indigo-600", Default: "bg-white border-gray-300 text-gray-500 hover:bg-gray-50" -->
-          <button *ngFor="let number of numbers" (click)="onSubmit(number, sortBy, orderCurrent.toString(), myform)" type="button" aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> {{number}} </button><!--href="{{domainename}}/access-admin/resto/list-categorieplats/{{number}}"-->
-          <button *ngIf="hasNextPage === true" (click)="onSubmit(nextPage, sortBy, orderCurrent.toString(), myform)" type="button" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"><!--href="{{domainename}}/access-admin/resto/list-categorieplats/{{nextPage}}"-->
+          <button *ngFor="let number of numbers" (click)="onSubmit(number, sortBy, orderCurrent.toString(), myform)" type="button" aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"> {{number}} </button><!--href="{{domainename}}/access-admin/auth/list-categorieplats/{{number}}"-->
+          <button *ngIf="hasNextPage === true" (click)="onSubmit(nextPage, sortBy, orderCurrent.toString(), myform)" type="button" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"><!--href="{{domainename}}/access-admin/auth/list-categorieplats/{{nextPage}}"-->
             <span class="sr-only">Next</span>
             <!-- Heroicon name: solid/chevron-right -->
             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

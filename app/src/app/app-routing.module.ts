@@ -21,16 +21,18 @@ import { ListVilleComponent } from './e-kaly/ville/list-ville/list-ville.compone
 import { CreateVilleComponent } from './e-kaly/ville/create-ville/create-ville.component';
 import { FicheVilleComponent } from './e-kaly/ville/fiche-ville/fiche-ville.component';
 import { UpdateVilleComponent } from './e-kaly/ville/update-ville/update-ville.component';
-import { ListCategoriePlatComponent } from './resto/categorie/list-categorie-plat/list-categorie-plat.component';
-import { FicheCategoriePlatComponent } from './resto/categorie/fiche-categorie-plat/fiche-categorie-plat.component';
-import { CreateCategoriePlatComponent } from './resto/categorie/create-categorie-plat/create-categorie-plat.component';
-import { UpdateCategoriePlatComponent } from './resto/categorie/update-categorie-plat/update-categorie-plat.component';
+import { ListCategoriePlatComponent } from './e-kaly/categorie/list-categorie-plat/list-categorie-plat.component';
+import { FicheCategoriePlatComponent } from './e-kaly/categorie/fiche-categorie-plat/fiche-categorie-plat.component';
+import { CreateCategoriePlatComponent } from './e-kaly/categorie/create-categorie-plat/create-categorie-plat.component';
+import { UpdateCategoriePlatComponent } from './e-kaly/categorie/update-categorie-plat/update-categorie-plat.component';
 import { RestoLoginComponent } from './resto/form/resto-login/resto-login.component';
 import { ChooseComponent } from './resto/choose/choose.component';
 import { ListPlatComponent } from './resto/plat/list-plat/list-plat.component';
 import { FichePlatComponent } from './resto/plat/fiche-plat/fiche-plat.component';
 import { CreatePlatComponent } from './resto/plat/create-plat/create-plat.component';
 import { UpdatePlatComponent } from './resto/plat/update-plat/update-plat.component';
+import { PagePlatComponent } from './client/page-plat/page-plat.component';
+import { PageRestoComponent } from './client/page-resto/page-resto.component';
 
 var ADMIN_PATH = 'access-admin/auth';
 var RESTO_PATH = 'access-admin/resto';
@@ -116,28 +118,28 @@ const routes: Routes = [
     component: UpdateVilleComponent
   } ,
   {
+    path: ADMIN_PATH+'/list-categorieplats',
+    component: ListCategoriePlatComponent
+  }  ,
+  {
+    path: ADMIN_PATH+'/fiche-categorieplats/:id',
+    component: FicheCategoriePlatComponent
+  }  ,
+  {
+    path: ADMIN_PATH+'/create-categorieplats',
+    component: CreateCategoriePlatComponent
+  }  ,
+  {
+    path: ADMIN_PATH+'/update-categorieplats/:id',
+    component: UpdateCategoriePlatComponent
+  }  ,
+  {
     path: RESTO_PATH,
     component: RestoLoginComponent
   } ,
   {
     path: RESTO_PATH+'/choose',
     component: ChooseComponent
-  }  ,
-  {
-    path: RESTO_PATH+'/list-categorieplats',
-    component: ListCategoriePlatComponent
-  }  ,
-  {
-    path: RESTO_PATH+'/fiche-categorieplats/:id',
-    component: FicheCategoriePlatComponent
-  }  ,
-  {
-    path: RESTO_PATH+'/create-categorieplats',
-    component: CreateCategoriePlatComponent
-  }  ,
-  {
-    path: RESTO_PATH+'/update-categorieplats/:id',
-    component: UpdateCategoriePlatComponent
   }  ,
   {
     path: RESTO_PATH+'/list-plats',
@@ -154,6 +156,14 @@ const routes: Routes = [
   {
     path: RESTO_PATH+'/update-plats/:id',
     component: UpdatePlatComponent
+  }  ,
+  {
+    path: 'plat',
+    component: PagePlatComponent
+  }  ,
+  {
+    path: 'resto',
+    component: PageRestoComponent
   } 
 ];
 

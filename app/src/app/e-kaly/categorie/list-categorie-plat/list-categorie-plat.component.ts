@@ -3,7 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { faRemove } from '@fortawesome/free-solid-svg-icons';
 import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
-import { RestoService } from '../../../service/resto.service';
+import { BackOfficeService } from '../../../service/back-office.service';
 
 import { WINDOW } from '../../../window.providers';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -33,7 +33,7 @@ export class ListCategoriePlatComponent implements OnInit {
   orderCurrent: Number;
   numbers: any;
   
-  constructor(private _Activatedroute:ActivatedRoute, private apiService: RestoService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
+  constructor(private _Activatedroute:ActivatedRoute, private apiService: BackOfficeService, private router: Router, @Inject(WINDOW) private window: Window, private spinner: NgxSpinnerService) { }
   
   
   ngOnInit(): void {
@@ -65,9 +65,9 @@ export class ListCategoriePlatComponent implements OnInit {
         }
        }
        else if(data['status'] === 202){
-        this.router.navigate(['/access-admin/resto']);  
+        this.router.navigate(['/access-admin']);  
        }else if(data['status'] === 201){
-        this.router.navigate(['/access-admin/resto/choose']);  
+        this.router.navigate(['/access-admin']);  
        }
        else{
         
@@ -90,7 +90,7 @@ export class ListCategoriePlatComponent implements OnInit {
        if(data['status'] === 200){
         this.router.routeReuseStrategy.shouldReuseRoute = () => false;
         this.router.onSameUrlNavigation = 'reload';         
-        this.router.navigate(['/access-admin/resto/list-categorieplats']);  
+        this.router.navigate(['/access-admin/auth/list-categorieplats']);  
        }
        else if(data['status'] === 202){
         this.router.navigate(['/access-admin']);  

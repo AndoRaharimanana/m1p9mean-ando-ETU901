@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { RestoService } from '../../../service/resto.service';
+import { BackOfficeService } from '../../../service/back-office.service';
 import {NgForm} from '@angular/forms';
 import { NgxSpinnerService } from "ngx-spinner";
 
@@ -11,7 +11,7 @@ import { NgxSpinnerService } from "ngx-spinner";
 })
 export class CreateCategoriePlatComponent implements OnInit {
 
-  constructor(private apiService: RestoService, private router: Router, private spinner: NgxSpinnerService) { }
+  constructor(private apiService: BackOfficeService, private router: Router, private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
     this.spinner.show();
@@ -26,10 +26,10 @@ export class CreateCategoriePlatComponent implements OnInit {
     this.apiService.createCategorieplat(form.value).subscribe((data) => {      
       console.log(data);
       if(data['status'] === 200){
-        this.router.navigate(['/access-admin/resto/fiche-categorieplats/'+data['data']._id]);  
+        this.router.navigate(['/access-admin/auth/fiche-categorieplats/'+data['data']._id]);  
        }
        else if(data['status'] === 202){
-        this.router.navigate(['/access-admin/resto']);  
+        this.router.navigate(['/access-admin']);  
        }else{
         
        }    
@@ -37,7 +37,7 @@ export class CreateCategoriePlatComponent implements OnInit {
     },
     err => {
       console.log("errorr");
-      this.router.navigate(['/access-admin/resto']);  
+      this.router.navigate(['/access-admin']);  
       this.spinner.hide(); 
     })
   }
