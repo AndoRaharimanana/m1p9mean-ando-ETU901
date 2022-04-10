@@ -14,8 +14,8 @@ var formidable = require('formidable');
 var fs = require('fs');
 
 const dbName = "e-kaly";
-const url ="mongodb://localhost:27017/e-kaly";
-//const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/e-kaly-preprod?retryWrites=true&w=majority';
+//const url ="mongodb://localhost:27017/e-kaly";
+const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/e-kaly-preprod?retryWrites=true&w=majority';
 const prefixBackOffice = "/back-office";
 const prefixResto = "/resto";
 
