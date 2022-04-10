@@ -33,6 +33,7 @@ import { CreatePlatComponent } from './resto/plat/create-plat/create-plat.compon
 import { UpdatePlatComponent } from './resto/plat/update-plat/update-plat.component';
 import { PagePlatComponent } from './client/page-plat/page-plat.component';
 import { PageRestoComponent } from './client/page-resto/page-resto.component';
+import { ConfigurationComponent } from './resto/plat/configuration/configuration.component';
 
 var ADMIN_PATH = 'access-admin/auth';
 var RESTO_PATH = 'access-admin/resto';
@@ -158,7 +159,11 @@ const routes: Routes = [
     component: UpdatePlatComponent
   }  ,
   {
-    path: 'plat',
+    path: RESTO_PATH+'/config-plats/:id',
+    component: ConfigurationComponent
+  }  ,
+  {
+    path: 'plat/:id',
     component: PagePlatComponent
   }  ,
   {

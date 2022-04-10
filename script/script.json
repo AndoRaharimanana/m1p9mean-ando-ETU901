@@ -275,7 +275,7 @@ db.restos.aggregate([
 	{
 		$match:{
 			"_id.daty":{
-				$lte: new Date(2022, 04, 07, 23, 00)
+				$lte: new Date()
 			}
 		}
 	},
@@ -296,7 +296,19 @@ db.restos.aggregate([
 		"$replaceRoot": {
 			"newRoot": "$doc"
 		}
-	}]).pretty(),
+	},
+	{
+		$lookup:{
+			from: "plats",
+			localField: "_id.plat",
+			foreignField: "_id",
+			as: "plat"
+		}
+	},
+	{
+		$unwind: "$plat"	
+	}
+	]).pretty(),
 	{
 		$project:{
 			maxDaty:{
@@ -311,4 +323,119 @@ db.restos.aggregate([
 
 
 
-		
+{
+	$match: {createur: ObjectId("6249dd1638279f91f693afa6")}
+},  
+db.plats.aggregate([	
+	{
+		$lookup: {
+			from: "categorieplats",
+			localField: "categorie",
+			foreignField: "_id",
+			as: "categorie"
+		}
+	},  
+	{
+		$lookup: {
+			from: "restos",
+			localField: "_id",
+			foreignField: "plats.plat",
+			as: "restos"
+		}
+	},
+]);
+
+
+		db.restos.aggregate([
+			{
+				$unwind: "$plats"
+			},
+			{
+				$group:{
+					_id:
+						"$plats"
+				}
+			},
+			{
+				$match:{
+					"_id.daty":{
+						$lte: new Date()
+					}
+				}
+			},
+			{
+				$sort:{
+					"_id.daty": -1
+				}
+			},
+			{
+				$group:{
+					_id: "$_id.plat",
+					doc: {
+						$first: '$$ROOT'
+					}
+				},
+			},
+			{
+				"$replaceRoot": {
+					"newRoot": "$doc"
+				}
+			},
+			{
+				$project:{
+					"info": "$_id"
+				}
+			},
+	{
+		$lookup:{
+			from: "plats",
+			localField: "info.plat",
+			foreignField: "_id",
+			as: "platsinfo"
+		}
+	},
+	{
+		$unwind: "$platsinfo"
+	},
+	{
+		$lookup:{
+			from: "categorieplats",
+			localField: "platsinfo.categorie",
+			foreignField: "_id",
+			as: "platsinfo.categorie"
+		}
+	},
+
+	{
+		$lookup:{
+			from: "restos",
+			localField: "platsinfo.createur",
+			foreignField: "_id",
+			as: "platsinfo.createur"
+		}
+	}	
+]).pretty()
+
+
+
+db.users.aggregate([
+	{
+		$lookup:{
+			from: "restos",
+			localField: "_id",
+			foreignField: "users.user",
+			as: "restos"                
+		}
+	},
+	{
+		$match:{
+					"restos._id":{
+						$ne: new ObjectId("62530039a14d7a7bcace206d")
+					}
+		}
+	}
+])
+
+
+
+db.restos.find().pretty()

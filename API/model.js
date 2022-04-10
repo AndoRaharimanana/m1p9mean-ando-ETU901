@@ -42,7 +42,10 @@ const restoSchema = new mongoose.Schema({
     adresse: String,
     ville: mongoose.Schema.Types.ObjectId,
     contact: String,
-    users:[]
+    users:[],
+    plats: [],
+    info: {},
+    platsinfo: {}
 });
 
 

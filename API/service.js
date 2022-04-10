@@ -1,6 +1,6 @@
 var crypto = require('crypto');
 const mongoose = require('mongoose');
-const { Users, Session, Ville, Role, CategoriePlat, Plat } = require("./model");
+const { Users, Session, Ville, Role, CategoriePlat, Plat, Resto } = require("./model");
 function crypt(string){
     return crypto.createHash('md5').update(string).digest('hex');
 }
@@ -185,6 +185,24 @@ async function getVilles(){
     .catch(console.error);
 }
 
+async function getRestosRandom(size){
+    console.log("get restos");
+    return await Resto.aggregate(
+        [
+            {
+                $sample: {
+                    size: size
+                }
+            }
+        ]
+    )
+    .then(results => {
+        console.log(results);
+        return results;
+    })
+    .catch(console.error);
+}
+
 async function getRoles(){
     console.log("get roles");
     return await Role.find().sort({valeur: 1})
@@ -205,7 +223,7 @@ async function getCategoriePlat(cdt){
     .catch(console.error);
 }
 
-async function getUsersNotHaveResto(){
+async function getUsersNotHaveResto(resto){
     console.log("get users not have resto");
     return await Users.aggregate([
         {
@@ -216,13 +234,13 @@ async function getUsersNotHaveResto(){
 				as: "restos"                
             }
         },
-		{
-			$match:{
-				restos:{
-					$eq: []
-				}
-			}
-		}
+        {
+            $match:{
+                        "restos._id":{
+                            $ne: mongoose.Types.ObjectId(resto)
+                        }
+            }
+        }
     ])
     .then(results => {
         console.log(results);
@@ -269,6 +287,182 @@ async function dataForm(){
         });
 }
 
+
+async function getDetailPlat(restoid, cdt){    
+    return Resto.aggregate([
+        {
+            $match:{
+                _id: mongoose.Types.ObjectId(restoid)
+            }
+        },        
+        {
+            $unwind: "$plats"
+        },
+        {
+            $group:{
+                _id:
+                    "$plats"
+            }
+        },
+        {
+            $match:{
+                "_id.daty":{
+                    $lte: new Date()
+                }
+            }
+        },
+        {
+            $sort:{
+                "_id.daty": -1
+            }
+        },
+        {
+            $group:{
+                _id: "$_id.plat",
+                doc: {
+                    $first: '$$ROOT'
+                }
+            },
+        },
+        {
+            "$replaceRoot": {
+                "newRoot": "$doc"
+            }
+        },
+        {
+            $project:{
+                "info": "$_id"
+            }
+        },
+{
+    $lookup:{
+        from: "plats",
+        localField: "info.plat",
+        foreignField: "_id",
+        as: "platsinfo"
+    }
+},
+{
+    $unwind: "$platsinfo"
+},
+{
+    $lookup:{
+        from: "categorieplats",
+        localField: "platsinfo.categorie",
+        foreignField: "_id",
+        as: "platsinfo.categorie"
+    }
+},
+{
+    $addFields: {
+        info:{
+            benefice:{
+                    $subtract: ['$info.prixVente','$info.prixRevient']
+            }
+        },
+        _id:{
+            benefice:{
+                    $subtract: ['$info.prixVente','$info.prixRevient']
+            }
+        }			
+    }
+}
+   ,
+        {
+            $match:cdt
+        }
+    ])/*
+    .then(results => {
+        return results;
+    })
+    .catch(error => console.error(error))                */
+}
+async function getDetailPlatAll(cdt){    
+    return Resto.aggregate([        
+        {
+            $unwind: "$plats"
+        },
+        {
+            $group:{
+                _id:
+                    "$plats"
+            }
+        },
+        {
+            $match:{
+                "_id.daty":{
+                    $lte: new Date()
+                }
+            }
+        },
+        {
+            $sort:{
+                "_id.daty": -1
+            }
+        },
+        {
+            $group:{
+                _id: "$_id.plat",
+                doc: {
+                    $first: '$$ROOT'
+                }
+            },
+        },
+        {
+            "$replaceRoot": {
+                "newRoot": "$doc"
+            }
+        },
+        {
+            $project:{
+                "info": "$_id"
+            }
+        },
+{
+    $lookup:{
+        from: "plats",
+        localField: "info.plat",
+        foreignField: "_id",
+        as: "platsinfo"
+    }
+},
+{
+    $unwind: "$platsinfo"
+},
+{
+    $lookup:{
+        from: "categorieplats",
+        localField: "platsinfo.categorie",
+        foreignField: "_id",
+        as: "platsinfo.categorie"
+    }
+},
+{
+    $addFields: {
+        info:{
+            benefice:{
+                    $subtract: ['$info.prixVente','$info.prixRevient']
+            }
+        },
+        _id:{
+            benefice:{
+                    $subtract: ['$info.prixVente','$info.prixRevient']
+            }
+        }			
+    }
+}
+   ,
+        {
+            $match:cdt
+        }
+    ])/*
+    .then(results => {
+        return results;
+    })
+    .catch(error => console.error(error))                */
+}
+
+
 exports.crypt = crypt;
 exports.createToken = createToken;
 exports.saveToken = saveToken;
@@ -282,4 +476,7 @@ exports.getUsersNotHaveResto = getUsersNotHaveResto;
 exports.checkAuthResto = checkAuthResto;
 exports.checkAuthRestoChoose = checkAuthRestoChoose;
 exports.getCategoriePlat = getCategoriePlat;
+exports.getDetailPlat = getDetailPlat;
+exports.getRestosRandom = getRestosRandom;
+exports.getDetailPlatAll = getDetailPlatAll;
 

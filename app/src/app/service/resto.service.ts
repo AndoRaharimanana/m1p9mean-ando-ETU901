@@ -32,7 +32,35 @@ getRestoUser() {
 ////////CRUD PLAT START///
 
 
+  /////TEMPLATE  UPDATE
+  configPlat(plat:any){
+    var resto = JSON.parse(localStorage.getItem("resto"));
+    var restoid = null;
+    if (resto != null) restoid = resto.id;
+    const header = new HttpHeaders({
+      'Authorization': localStorage.getItem('token')
+    });  
+    return this.http.put(this.nomdomaine+this.prefix+"/plat/config/"+restoid, plat, {
+      headers: header,
+      //withCredentials: true
+    });      
+  }
 
+getPlatsInfo(id: String) {
+  var resto = JSON.parse(localStorage.getItem("resto"));
+  var restoid = null;
+  if (resto != null) restoid = resto.id;
+  console.log(localStorage.getItem('token'));
+  const header = new HttpHeaders({
+    'Authorization': localStorage.getItem('token')
+  });    
+  console.log(header);
+  var c = this.nomdomaine+this.prefix+'/plat/config/'+restoid+'/'+id;    
+  return this.http.get(c, {
+    headers: header,
+    //withCredentials: true
+  });
+}
   
   
   /////TEMPLATE FINDALL

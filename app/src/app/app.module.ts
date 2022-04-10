@@ -47,6 +47,8 @@ import { CreatePlatComponent } from './resto/plat/create-plat/create-plat.compon
 import { UpdatePlatComponent } from './resto/plat/update-plat/update-plat.component';
 import { PagePlatComponent } from './client/page-plat/page-plat.component';
 import { PageRestoComponent } from './client/page-resto/page-resto.component';
+import { ConfigurationComponent } from './resto/plat/configuration/configuration.component';
+
 
 
 @NgModule({
@@ -87,7 +89,8 @@ import { PageRestoComponent } from './client/page-resto/page-resto.component';
     CreatePlatComponent,
     UpdatePlatComponent,
     PagePlatComponent,
-    PageRestoComponent
+    PageRestoComponent,
+    ConfigurationComponent
   ],
   imports: [
     BrowserModule,

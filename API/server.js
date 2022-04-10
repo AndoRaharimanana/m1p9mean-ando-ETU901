@@ -22,6 +22,7 @@ const prefixResto = "/resto";
 const access_backoffice = [1, 2, 3];
 const access_resto = [1, 2, 3];
 const nbPageUser = 10;
+const nbPageClient = 12;
 
 //process.env.PORT
 app.listen(1010  , function(){ 
@@ -46,7 +47,7 @@ app.use(function(req, res, next) {
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }).then(client=>{
     console.log('Connected to Database Mongoose');  
 
-app.get('/page-upload-test', (req, res)=>{
+/*app.get('/page-upload-test', (req, res)=>{
     //res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('<form action="/upload-test" method="post" enctype="multipart/form-data">');
     res.write('<input type="file" name="filetoupload"><br>');
@@ -71,9 +72,280 @@ app.post('/upload-test', (req, res) =>{
           res.end(); 
         });
     });
-});
+});*/
 
-    ///////////********RESTO START* */
+
+///////////********CLIENT START* */
+
+                    ////***TEMPLATE FICHE FINDBYID */
+                    app.get('/get-plat/:id', async (req, res) =>{        
+                        console.log('Auth '+req.header('authorization'));
+                        
+                        console.log("token valide");
+                        var cdt = {};
+                        cdt["platsinfo._id"] = mongoose.Types.ObjectId(req.params.id);
+                        var results = await service.getDetailPlatAll(cdt);
+                        //.then(results => {
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        /*})
+                        .catch(error => console.error(error))                     */
+                    });  
+
+                    ////***TEMPLATE SEARCH LIST */
+                    app.post('/search-plats/:page?/:orderby?/:order?', async (req, res) =>{        
+                        
+  
+                        var p = 1;
+                        var orderby = "platsinfo.libelle";
+                        var order = 1;
+                        var critere = {};
+                        if(req.body.libelle!=null && req.body.libelle !== "") critere["platsinfo.libelle"] = {}, critere["platsinfo.libelle"]["$regex"] = req.body.libelle, critere["platsinfo.libelle"]["$options"] = "i";
+                        if(req.body.categorie!=null && req.body.categorie !== "") critere["platsinfo.categorie._id"] = mongoose.Types.ObjectId(req.body.categorie);
+                        if(req.body.resto!=null && req.body.resto !== "") critere["platsinfo.createur.nom"] = {}, critere["platsinfo.createur.nom"]["$regex"] = req.body.resto, critere["platsinfo.createur.nom"]["$options"] = "i";
+                        //critere["platsinfo.createur"] = mongoose.Types.ObjectId(req.params.restoid);
+
+                        
+                        console.log(critere);
+                
+                        if((req.params.page != null)){
+                            p = req.params.page;
+                        }
+                        if((req.params.orderby != null)){
+                            orderby = req.params.orderby;
+                        }
+                        if((req.params.order != null)){
+                            order = parseInt(req.params.order);
+                        }                
+                        console.log(p);
+                        const options = {
+                            page: p,
+                            limit: nbPageClient,
+                          };
+                console.log(options);
+                        console.log("token valide");
+                        const orderBy = {};
+                        orderBy[orderby] = order;
+                        var dataform = await service.getCategoriePlat({});    
+                        var resto = await service.getRestosRandom(4);
+                        var cursor = Resto.aggregate([                            
+                            {
+                                $unwind: "$plats"
+                            },
+                            {
+                                $group:{
+                                    _id:
+                                        "$plats"
+                                }
+                            },
+                            {
+                                $match:{
+                                    "_id.daty":{
+                                        $lte: new Date()
+                                    }
+                                }
+                            },
+                            {
+                                $sort:{
+                                    "_id.daty": -1
+                                }
+                            },
+                            {
+                                $group:{
+                                    _id: "$_id.plat",
+                                    doc: {
+                                        $first: '$$ROOT'
+                                    }
+                                },
+                            },
+                            {
+                                "$replaceRoot": {
+                                    "newRoot": "$doc"
+                                }
+                            },
+                            {
+                                $project:{
+                                    "info": "$_id"
+                                }
+                            },
+                    {
+                        $lookup:{
+                            from: "plats",
+                            localField: "info.plat",
+                            foreignField: "_id",
+                            as: "platsinfo"
+                        }
+                    },
+                    {
+                        $unwind: "$platsinfo"
+                    },
+                    {
+                        $lookup:{
+                            from: "categorieplats",
+                            localField: "platsinfo.categorie",
+                            foreignField: "_id",
+                            as: "platsinfo.categorie"
+                        }
+                    } ,
+                    {
+                        $lookup:{
+                            from: "restos",
+                            localField: "platsinfo.createur",
+                            foreignField: "_id",
+                            as: "platsinfo.createur"
+                        }
+                    }     ,{
+                        $match: critere
+                    }   ,                    
+                    {
+                        $sort: orderBy
+                    }                                    
+                        ]);
+                        //cursor.match({nom: "Rakoto"});
+                        Resto.aggregatePaginate(cursor, options)
+                        .then(results => {
+                            results['sortBy'] = orderby;
+                            results['order'] = order;
+                            results['dataform'] = dataform;
+                            result['resto'] = resto;
+                            console.log(results);
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: results
+                            };
+                            res.json(send);
+                        })
+                        .catch(error => console.error(error))            
+                    }); 
+
+app.get('/get-plats', async (req, res) =>{                                
+    var p = 1;
+    var orderby = "platsinfo.libelle";
+    var order = 1;
+    /*if((req.params.page != null)){
+        p = req.params.page;
+    }
+    if((req.params.orderby != null)){
+        orderby = req.params.orderby;
+    }
+    if((req.params.order != null)){
+        order = parseInt(req.params.order);
+    }      */          
+    console.log(p);
+    const options = {
+        page: p,
+        limit: nbPageClient,
+      };
+console.log(options);
+    console.log('Auth '+req.header('authorization'));  
+   
+    console.log("token valide");
+    const orderBy = {};
+    orderBy[orderby] = order;
+    var dataform = await service.getCategoriePlat({});                        
+    var resto = await service.getRestosRandom(4);
+    //var cursor = service.getDetailPlat(cdt);
+    var cursor = Resto.aggregate([
+        {
+            $unwind: "$plats"
+        },
+        {
+            $group:{
+                _id:
+                    "$plats"
+            }
+        },
+        {
+            $match:{
+                "_id.daty":{
+                    $lte: new Date()
+                }
+            }
+        },
+        {
+            $sort:{
+                "_id.daty": -1
+            }
+        },
+        {
+            $group:{
+                _id: "$_id.plat",
+                doc: {
+                    $first: '$$ROOT'
+                }
+            },
+        },
+        {
+            "$replaceRoot": {
+                "newRoot": "$doc"
+            }
+        },
+        {
+            $project:{
+                "info": "$_id"
+            }
+        },
+{
+    $lookup:{
+        from: "plats",
+        localField: "info.plat",
+        foreignField: "_id",
+        as: "platsinfo"
+    }
+},
+{
+    $unwind: "$platsinfo"
+},
+{
+    $lookup:{
+        from: "categorieplats",
+        localField: "platsinfo.categorie",
+        foreignField: "_id",
+        as: "platsinfo.categorie"
+    }
+},
+{
+    $lookup:{
+        from: "restos",
+        localField: "platsinfo.createur",
+        foreignField: "_id",
+        as: "platsinfo.createur"
+    }
+}   ,                    
+{
+    $sort: orderBy
+}                       
+    ])
+    //cursor.match({nom: "Rakoto"});
+   await Resto.aggregatePaginate(cursor, options)
+    .then(results => {
+        results['sortBy'] = orderby;
+        results['order'] = order;
+        results['dataform'] = dataform;
+        results['resto'] = resto;
+        console.log(results);
+        var send = {
+            status: 200,
+            message: "success",
+            data: results
+        };
+        res.json(send);
+    })
+    .catch(error => console.error(error))            
+});   
+
+
+///////////********CLIENT END* */
+
+
+
+///////////********RESTO START* */
 ////**/*GET RESTO PROP USER START*/
                     app.get(prefixResto+'/choose', async (req, res) =>{        
                         console.log('Auth '+req.header('authorization'));
@@ -101,7 +373,166 @@ app.post('/upload-test', (req, res) =>{
 
 
 /****CRUD  PLAT START */
+/*
+app.put(prefixResto+'/plat/config/publish/:restoid', async (req, res) =>{
+    console.log('Auth '+req.header('authorization'));
+    var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+            
+    console.log(denied);
 
+    if(!denied){
+        console.log("token invalide");
+        var send = {
+            status: 202,
+            message: "Accés refusé",
+            data: []
+        };
+        res.json(send);
+        return;
+    }    
+
+    var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+    if(!denied2){
+        console.log("token invalide");
+        var send = {
+            status: 201,
+            message: "Choix resto",
+            data: []
+        };
+        res.json(send);
+        return;
+    }    
+    console.log("token valide");
+    var restoUpdate = {};
+        var addPlat = {};
+        addPlat = {
+            plats:{
+                "$elemMatch":{
+                    prixRevient: {$eq:parseFloat(req.body.prixRevient)},
+                    prixVente: {$eq:parseFloat(req.body.prixVente)},                    
+                    etat: {$eq:parseInt(req.body.etat)},
+                    daty: ISODate(req.body.daty)
+                }
+            }
+        };
+    console.log(restoUpdate);
+    await Resto.findByIdAndUpdate(req.params.restoid, 
+        restoUpdate)
+        .then(results =>{
+            console.log(results);
+            console.log("resto modifier");
+            var send = {
+                status: 200,
+                message: "success",
+                data: []
+            };
+            res.json(send);
+        })
+        .catch(console.error);
+});  */
+                ////***TEMPLATE UPDATE */
+                app.put(prefixResto+'/plat/config/:restoid', async (req, res) =>{
+                    console.log('Auth '+req.header('authorization'));
+                    var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                            
+                    console.log(denied);
+            
+                    if(!denied){
+                        console.log("token invalide");
+                        var send = {
+                            status: 202,
+                            message: "Accés refusé",
+                            data: []
+                        };
+                        res.json(send);
+                        return;
+                    }    
+            
+                    var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+                    if(!denied2){
+                        console.log("token invalide");
+                        var send = {
+                            status: 201,
+                            message: "Choix resto",
+                            data: []
+                        };
+                        res.json(send);
+                        return;
+                    }    
+                    console.log("token valide");
+                    var restoUpdate = {};
+                        var addPlat = {};
+                        addPlat = {
+                            plats:{
+                                "plat": mongoose.Types.ObjectId(req.body.id),
+                                "prixRevient": parseFloat(req.body.prixRevient),
+                                "prixVente": parseFloat(req.body.prixVente),
+                                "etat": parseInt(req.body.etat),
+                                "daty": new Date()
+                            }
+                        };
+                        restoUpdate['$push'] = addPlat;
+                    console.log(restoUpdate);
+                    await Resto.findByIdAndUpdate(req.params.restoid, 
+                        restoUpdate)
+                        .then(results =>{
+                            console.log(results);
+                            console.log("resto modifier");
+                            var send = {
+                                status: 200,
+                                message: "success",
+                                data: []
+                            };
+                            res.json(send);
+                        })
+                        .catch(console.error);
+                });    
+
+    ////***TEMPLATE PAGE UPDATE SI DATAFORM */
+    app.get(prefixResto+'/plat/config/:restoid/:id', async (req, res) =>{        
+        console.log('Auth '+req.header('authorization'));
+        var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
+                
+        console.log(denied);
+
+        if(!denied){
+            console.log("token invalide");
+            var send = {
+                status: 202,
+                message: "Accés refusé",
+                data: []
+            };
+            res.json(send);
+            return;
+        }    
+
+        var denied2 = await service.checkAuthResto(req.header('authorization'), req.params.restoid, 2);
+        if(!denied2){
+            console.log("token invalide");
+            var send = {
+                status: 201,
+                message: "Choix resto",
+                data: []
+            };
+            res.json(send);
+            return;
+        }   
+        console.log("token valide");
+        var cdt = {};
+        cdt["platsinfo._id"] = mongoose.Types.ObjectId(req.params.id);
+       
+        
+        var results = await service.getDetailPlat(req.params.restoid, cdt); 
+                
+            console.log(results);
+            var send = {
+                status: 200,
+                message: "success",
+                data: results
+            };
+            res.json(send);       
+    });      
+  
 
                     ////***TEMPLATE DELETE */
                     app.delete(prefixResto+'/plat/:restoid/:id', async (req, res) =>{
@@ -240,20 +671,41 @@ app.post('/upload-test', (req, res) =>{
                         .then(result =>{
                             console.log(result);
                             console.log("plat enregistrer");
+                            
+                            newPlat = result;
+                        })
+                        .catch(console.error);
+
+                        var restoDefaultPrice = {};
+                        var addPlat = {};
+                        addPlat = {
+                            plats:{
+                                "plat": mongoose.Types.ObjectId(newPlat._id),
+                                "prixRevient": 0,
+                                "prixVente": 0,
+                                "etat": 1,
+                                "daty": new Date()
+                            }
+                        };
+                        restoDefaultPrice['$push'] = addPlat;
+                    console.log(restoDefaultPrice);
+                    await Resto.findByIdAndUpdate(req.params.restoid, 
+                        restoDefaultPrice)
+                        .then(results =>{
                             var send = {
                                 status: 200,
                                 message: "success",
-                                data: result
+                                data: newPlat
                             };
                             res.json(send);
                         })
-                        .catch(console.error);
+                        .catch(console.error);                        
                     });       
                 
                     ////***TEMPLATE FINDALL INI */
                     app.get(prefixResto+'/get-plats/:restoid', async (req, res) =>{                                
                         var p = 1;
-                        var orderby = "libelle";
+                        var orderby = "platsinfo.libelle";
                         var order = 1;
                         /*if((req.params.page != null)){
                             p = req.params.page;
@@ -301,24 +753,92 @@ app.post('/upload-test', (req, res) =>{
                         const orderBy = {};
                         orderBy[orderby] = order;
                         var dataform = await service.getCategoriePlat({});                        
-                        var cursor = Plat.aggregate([
+
+                        //var cursor = service.getDetailPlat(cdt);
+                        var cursor = Resto.aggregate([
                             {
-                                $match: {createur: mongoose.Types.ObjectId(req.params.restoid)}
-                            },  
-                            {
-                                $lookup: {
-                                    from: "categorieplats",
-                                    localField: "categorie",
-                                    foreignField: "_id",
-                                    as: "categorie"
+                                $match:{
+                                    _id: mongoose.Types.ObjectId(req.params.restoid)
                                 }
-                            },                          
+                            },
                             {
-                                $sort: orderBy
-                            }
-                        ]);
+                                $unwind: "$plats"
+                            },
+                            {
+                                $group:{
+                                    _id:
+                                        "$plats"
+                                }
+                            },
+                            {
+                                $match:{
+                                    "_id.daty":{
+                                        $lte: new Date()
+                                    }
+                                }
+                            },
+                            {
+                                $sort:{
+                                    "_id.daty": -1
+                                }
+                            },
+                            {
+                                $group:{
+                                    _id: "$_id.plat",
+                                    doc: {
+                                        $first: '$$ROOT'
+                                    }
+                                },
+                            },
+                            {
+                                "$replaceRoot": {
+                                    "newRoot": "$doc"
+                                }
+                            },
+                            {
+                                $project:{
+                                    "info": "$_id"
+                                }
+                            },
+                    {
+                        $lookup:{
+                            from: "plats",
+                            localField: "info.plat",
+                            foreignField: "_id",
+                            as: "platsinfo"
+                        }
+                    },
+                    {
+                        $unwind: "$platsinfo"
+                    },
+                    {
+                        $lookup:{
+                            from: "categorieplats",
+                            localField: "platsinfo.categorie",
+                            foreignField: "_id",
+                            as: "platsinfo.categorie"
+                        }
+                    } ,
+                    {
+                        $addFields: {
+                            info:{
+                                benefice:{
+                                        $subtract: ['$info.prixVente','$info.prixRevient']
+                                }
+                            },
+                            _id:{
+                                benefice:{
+                                        $subtract: ['$info.prixVente','$info.prixRevient']
+                                }
+                            }			
+                        }
+                    }  ,                    
+                    {
+                        $sort: orderBy
+                    }                       
+                        ])
                         //cursor.match({nom: "Rakoto"});
-                        Plat.aggregatePaginate(cursor, options)
+                       await Resto.aggregatePaginate(cursor, options)
                         .then(results => {
                             results['sortBy'] = orderby;
                             results['order'] = order;
@@ -339,14 +859,14 @@ app.post('/upload-test', (req, res) =>{
                         
   
                         var p = 1;
-                        var orderby = "libelle";
+                        var orderby = "platsinfo.libelle";
                         var order = 1;
                         var critere = {};
-                        if(req.body.libelle!=null && req.body.libelle !== "") critere["libelle"] = {}, critere["libelle"]["$regex"] = req.body.libelle, critere["libelle"]["$options"] = "i";
-                        if(req.body.categorie!=null && req.body.categorie !== "") critere["categorie"] = mongoose.Types.ObjectId(req.body.categorie);
-                        critere["createur"] = mongoose.Types.ObjectId(req.params.restoid);
-                        if(req.body.description!=null && req.body.description !== "") critere["description"] = {}, critere["description"]["$regex"] = req.body.description, critere["description"]["$options"] = "i";
-                        if(req.body.recette!=null && req.body.recette !== "") critere["recette"] = {}, critere["recette"]["$regex"] = req.body.recette, critere["recette"]["$options"] = "i";
+                        if(req.body.libelle!=null && req.body.libelle !== "") critere["platsinfo.libelle"] = {}, critere["platsinfo.libelle"]["$regex"] = req.body.libelle, critere["platsinfo.libelle"]["$options"] = "i";
+                        if(req.body.categorie!=null && req.body.categorie !== "") critere["platsinfo.categorie._id"] = mongoose.Types.ObjectId(req.body.categorie);
+                        critere["platsinfo.createur"] = mongoose.Types.ObjectId(req.params.restoid);
+                        if(req.body.description!=null && req.body.description !== "") critere["platsinfo.description"] = {}, critere["platsinfo.description"]["$regex"] = req.body.description, critere["platsinfo.description"]["$options"] = "i";
+                        if(req.body.recette!=null && req.body.recette !== "") critere["platsinfo.recette"] = {}, critere["platsinfo.recette"]["$regex"] = req.body.recette, critere["platsinfo.recette"]["$options"] = "i";
                         
                         console.log(critere);
                 
@@ -395,25 +915,92 @@ app.post('/upload-test', (req, res) =>{
                         const orderBy = {};
                         orderBy[orderby] = order;
                         var dataform = await service.getCategoriePlat({});                        
-                        var cursor = Plat.aggregate([
+                        var cursor = Resto.aggregate([
                             {
-                                $match: critere
-                            },  
-                            {
-                                $lookup: {
-                                    from: "categorieplats",
-                                    localField: "categorie",
-                                    foreignField: "_id",
-                                    as: "categorie"
+                                $match:{
+                                    _id: mongoose.Types.ObjectId(req.params.restoid)
                                 }
-                            
+                            },                            
+                            {
+                                $unwind: "$plats"
                             },
                             {
-                                $sort: orderBy
-                            }
+                                $group:{
+                                    _id:
+                                        "$plats"
+                                }
+                            },
+                            {
+                                $match:{
+                                    "_id.daty":{
+                                        $lte: new Date()
+                                    }
+                                }
+                            },
+                            {
+                                $sort:{
+                                    "_id.daty": -1
+                                }
+                            },
+                            {
+                                $group:{
+                                    _id: "$_id.plat",
+                                    doc: {
+                                        $first: '$$ROOT'
+                                    }
+                                },
+                            },
+                            {
+                                "$replaceRoot": {
+                                    "newRoot": "$doc"
+                                }
+                            },
+                            {
+                                $project:{
+                                    "info": "$_id"
+                                }
+                            },
+                    {
+                        $lookup:{
+                            from: "plats",
+                            localField: "info.plat",
+                            foreignField: "_id",
+                            as: "platsinfo"
+                        }
+                    },
+                    {
+                        $unwind: "$platsinfo"
+                    },
+                    {
+                        $lookup:{
+                            from: "categorieplats",
+                            localField: "platsinfo.categorie",
+                            foreignField: "_id",
+                            as: "platsinfo.categorie"
+                        }
+                    }     ,{
+                        $match: critere
+                    } ,
+                    {
+                        $addFields: {
+                            info:{
+                                benefice:{
+                                        $subtract: ['$info.prixVente','$info.prixRevient']
+                                }
+                            },
+                            _id:{
+                                benefice:{
+                                        $subtract: ['$info.prixVente','$info.prixRevient']
+                                }
+                            }			
+                        }
+                    },                    
+                    {
+                        $sort: orderBy
+                    }                                    
                         ]);
                         //cursor.match({nom: "Rakoto"});
-                        Plat.aggregatePaginate(cursor, options)
+                        Resto.aggregatePaginate(cursor, options)
                         .then(results => {
                             results['sortBy'] = orderby;
                             results['order'] = order;
@@ -458,7 +1045,7 @@ app.post('/upload-test', (req, res) =>{
                             return;
                         }   
                         console.log("token valide");
-                        const cursor = await Plat.aggregate([
+                        /*const cursor = await Plat.aggregate([
                             {
                                 $match:{_id: mongoose.Types.ObjectId(req.params.id)}
                             },            
@@ -473,8 +1060,11 @@ app.post('/upload-test', (req, res) =>{
                             {
                                 $limit: 1
                             }
-                        ])
-                        .then(results => {
+                        ])*/
+                        var cdt = {};
+                        cdt["platsinfo._id"] = mongoose.Types.ObjectId(req.params.id);
+                        var results = await service.getDetailPlat(req.params.restoid, cdt);
+                        //.then(results => {
                             console.log(results);
                             var send = {
                                 status: 200,
@@ -482,8 +1072,8 @@ app.post('/upload-test', (req, res) =>{
                                 data: results
                             };
                             res.json(send);
-                        })
-                        .catch(error => console.error(error))                     
+                        /*})
+                        .catch(error => console.error(error))                     */
                     });       
   
     ////***TEMPLATE PAGE CREATE SI DATAFORM */
@@ -799,6 +1389,8 @@ app.post('/upload-test', (req, res) =>{
                         console.log("token valide");
                         const orderBy = {};
                         orderBy[orderby] = order;
+                        console.log("critere");
+                        console.log(critere);
                         var cursor = CategoriePlat.aggregate([
                             {
                                 $match: critere
@@ -1830,7 +2422,7 @@ app.post('/upload-test', (req, res) =>{
                             return;
                         }    
                         console.log("token valide");
-                        var dataform = await service.getUsersNotHaveResto();
+                        var dataform = await service.getUsersNotHaveResto(req.params.id);
                         const cursor = await Resto.aggregate([
                             {
                                 $match:{_id: mongoose.Types.ObjectId(req.params.id)}
