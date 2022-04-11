@@ -14,10 +14,11 @@ var formidable = require('formidable');
 var fs = require('fs');
 
 const dbName = "e-kaly";
-//const url ="mongodb://localhost:27017/e-kaly";
-const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/e-kaly-preprod?retryWrites=true&w=majority';
+const url ="mongodb://localhost:27017/e-kaly";
+//const url = 'mongodb+srv://nanando:Ar12252831@refresh-mongodb.ysocs.mongodb.net/e-kaly-preprod?retryWrites=true&w=majority';
 const prefixBackOffice = "/back-office";
 const prefixResto = "/resto";
+const IDROLE_USERS = mongoose.Types.ObjectId("62486e4eb51e6994ffaea34c");
 
 const access_backoffice = [1, 2, 3];
 const access_resto = [1, 2, 3];
@@ -25,7 +26,7 @@ const nbPageUser = 10;
 const nbPageClient = 12;
 
 //process.env.PORT
-app.listen(process.env.PORT  , function(){ 
+app.listen(1010  , function(){ 
     var u = new Users();
     u.id = 546456564;
     console.log(service.createToken(u));  
@@ -76,6 +77,68 @@ app.post('/upload-test', (req, res) =>{
 
 
 ///////////********CLIENT START* */
+
+    ////***TEMPLATE CREATE */
+    app.post('/signup', async (req, res) => {
+        console.log("token valide");
+        var newUser = new Users();
+        newUser.nom = req.body.nom;
+        newUser.prenom = req.body.prenom;   
+        newUser.email = req.body.email;   
+        newUser.sexe = req.body.sexe;   
+        newUser.adresse = req.body.adresse;   
+        newUser.mdp = service.crypt(req.body.mdp);   
+        newUser.ville = req.body.ville;   
+        newUser.contact = req.body.contact;   
+        newUser.role = IDROLE_USERS;   
+
+console.log(newUser);
+        await newUser.save()
+        .then(result =>{
+            console.log(result);
+            console.log("user enregistrer");
+            var send = {
+                status: 200,
+                message: "success",
+                data: result
+            };
+            res.json(send);
+        })
+        .catch(console.error);
+    });   
+
+    ////***TEMPLATE PAGE CREATE SI DATAFORM */
+    app.get('/signup-form', async (req, res) =>{        
+        var dataform = await service.getVilles();
+        var send = {
+            status: 200,
+            message: "success",
+            data: dataform
+        };
+        res.json(send);                    
+    }); 
+
+app.get('/authentification', async (req, res) =>{        
+    var denied = await service.checkAuth(req.header('authorization'), [], 10);
+
+    console.log(denied);
+    if(denied == null){
+        console.log("token invalide");
+        var send = {
+            status: 202,
+            message: "Accés refusé",
+            data: []
+        };
+        res.json(send);
+        return;
+    }  
+    var send = {
+        status: 200,
+        message: "success",
+        data: []
+    };
+    res.json(send);        
+});  
 
                     ////***TEMPLATE FICHE FINDBYID */
                     app.get('/get-plat/:id', async (req, res) =>{        
@@ -199,7 +262,14 @@ app.post('/upload-test', (req, res) =>{
                             foreignField: "_id",
                             as: "platsinfo.createur"
                         }
-                    }     ,{
+                    }  ,
+                    {
+                        $match:{
+                            "info.etat":{
+                                $eq: 0
+                            }
+                        }
+                    }   ,{
                         $match: critere
                     }   ,                    
                     {
@@ -212,7 +282,7 @@ app.post('/upload-test', (req, res) =>{
                             results['sortBy'] = orderby;
                             results['order'] = order;
                             results['dataform'] = dataform;
-                            result['resto'] = resto;
+                            results['resto'] = resto;
                             console.log(results);
                             var send = {
                                 status: 200,
@@ -317,6 +387,13 @@ console.log(options);
         foreignField: "_id",
         as: "platsinfo.createur"
     }
+} ,
+{
+    $match:{
+        "info.etat":{
+            $eq: 0
+        }
+    }
 }   ,                    
 {
     $sort: orderBy
@@ -373,7 +450,7 @@ console.log(options);
 
 
 /****CRUD  PLAT START */
-/*
+
 app.put(prefixResto+'/plat/config/publish/:restoid', async (req, res) =>{
     console.log('Auth '+req.header('authorization'));
     var denied = await service.checkAuthRestoChoose(req.header('authorization'), 2);
@@ -403,33 +480,44 @@ app.put(prefixResto+'/plat/config/publish/:restoid', async (req, res) =>{
         return;
     }    
     console.log("token valide");
+    console.log(req.body.daty);
     var restoUpdate = {};
         var addPlat = {};
         addPlat = {
-            plats:{
                 "$elemMatch":{
+                    plat: {$eq: mongoose.Types.ObjectId(req.body.idplat)},
                     prixRevient: {$eq:parseFloat(req.body.prixRevient)},
                     prixVente: {$eq:parseFloat(req.body.prixVente)},                    
-                    etat: {$eq:parseInt(req.body.etat)},
-                    daty: ISODate(req.body.daty)
-                }
+                    etat: {$eq:parseInt(req.body.etatOrigin)},
+                    daty: new Date(req.body.daty)                
             }
         };
+        console.log("addPLat");
+    console.log(addPlat);
+    restoUpdate['plats'] = addPlat;
     console.log(restoUpdate);
-    await Resto.findByIdAndUpdate(req.params.restoid, 
-        restoUpdate)
+    await Resto.updateOne({
+        _id: mongoose.Types.ObjectId(req.params.restoid),
+        plats: addPlat
+    },         
+        {
+            $set:{
+                "plats.$.etat": parseInt(req.body.etat)
+            }
+        })
         .then(results =>{
             console.log(results);
-            console.log("resto modifier");
+            console.log("resto publier modifier");
             var send = {
                 status: 200,
                 message: "success",
-                data: []
+                data: results,
+                id: req.body.idplat
             };
             res.json(send);
         })
         .catch(console.error);
-});  */
+});  
                 ////***TEMPLATE UPDATE */
                 app.put(prefixResto+'/plat/config/:restoid', async (req, res) =>{
                     console.log('Auth '+req.header('authorization'));

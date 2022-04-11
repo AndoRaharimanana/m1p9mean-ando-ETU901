@@ -1,5 +1,9 @@
 import { Component, OnInit, ElementRef, HostListener, Input } from '@angular/core';
-
+import { ClientServiceService } from '../../service/client-service.service';
+import { BackOfficeService } from '../../service/back-office.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgxSpinnerService } from "ngx-spinner";
+import { AuthServiceService } from '../../auth-service.service';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -7,6 +11,8 @@ import { Component, OnInit, ElementRef, HostListener, Input } from '@angular/cor
 })
 export class HeaderComponent implements OnInit {
   public text: String;
+  public connect = 1;
+  username = JSON.parse(localStorage.getItem("user"));
   @HostListener('document:click', ['$event'])
   clickout(event) {
     if(!event.target.className.includes("subMenu-section")){
@@ -16,13 +22,26 @@ export class HeaderComponent implements OnInit {
     
   }
 
-  constructor(private eRef: ElementRef) {
+  constructor(private backService: BackOfficeService, private apiService: ClientServiceService, private eRef: ElementRef, private router: Router, private spinner: NgxSpinnerService, private authService: AuthServiceService) {
+    console.log(this.username);
     this.text = 'no clicks yet';
+
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void {    
+    console.log(this.username);
     this.hiddenAllMenu("subMenu");
     this.hiddenAllMenu("subMenuMob");
+    this.apiService.authentification().subscribe((data) => {      
+      console.log(data);
+      if(data != null){
+        if(data['status'] === 200){
+          this.connect = 0;            
+         }
+        //this.router.navigate(['/']);  
+      }
+                
+    })      
   }
 
 
@@ -74,5 +93,27 @@ showSubMenu(subMenu){
   var current = subMenu.getAttribute('class');
   subMenu.setAttribute("class", current.replaceAll("hidden", ""));
 }
-
+signout(origin: any){
+  this.spinner.show();
+  this.backService.logout(origin).subscribe((data)=>{      
+    console.log(data);
+     console.log('ici =='+data['status']);
+     if(data['status'] === 200){
+      this.authService.signout();
+     }
+     else if(data['status'] === 202){
+     }else{
+      
+     }       
+     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+     this.router.onSameUrlNavigation = 'reload';              
+     this.router.navigate(['/']); 
+     this.spinner.hide();  
+   },
+   err => {
+     console.log("errorr");
+     this.router.navigate(['/']); 
+     this.spinner.hide();  
+   });         
+}
 }

@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit {
   
   
   ngOnInit(): void {
+    console.log("efezfzpoejf");
     this.spinner.show();
     this.apiService.getPlats().subscribe((data)=>{      
       console.log(data);

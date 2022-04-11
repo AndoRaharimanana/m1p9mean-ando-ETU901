@@ -25,7 +25,7 @@ export class PagePlatComponent implements OnInit {
     this.id=this._Activatedroute.snapshot.paramMap.get("id");
     this.apiService.getPlat(this.id).subscribe((data)=>{      
       console.log(data);
-       console.log('ici =='+data['status']);
+       console.log('ici F=='+data['status']);
        if(data['status'] === 200){
         this.plat = data['data'][0];            
        }else if(data['status'] === 201){

@@ -32,7 +32,21 @@ getRestoUser() {
 ////////CRUD PLAT START///
 
 
-  /////TEMPLATE  UPDATE
+/////TEMPLATE  UPDATE
+publishPlat(plat:any){
+  var resto = JSON.parse(localStorage.getItem("resto"));
+  var restoid = null;
+  if (resto != null) restoid = resto.id;
+  const header = new HttpHeaders({
+    'Authorization': localStorage.getItem('token')
+  });  
+  return this.http.put(this.nomdomaine+this.prefix+"/plat/config/publish/"+restoid, plat, {
+    headers: header,
+    //withCredentials: true
+  });      
+}  
+
+/////TEMPLATE  UPDATE
   configPlat(plat:any){
     var resto = JSON.parse(localStorage.getItem("resto"));
     var restoid = null;

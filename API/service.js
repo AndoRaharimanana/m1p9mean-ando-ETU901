@@ -436,6 +436,13 @@ async function getDetailPlatAll(cdt){
         foreignField: "_id",
         as: "platsinfo.categorie"
     }
+} ,
+{
+    $match:{
+        "info.etat":{
+            $eq: 0
+        }
+    }
 },
 {
     $addFields: {

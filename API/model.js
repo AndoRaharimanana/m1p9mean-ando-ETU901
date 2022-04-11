@@ -68,6 +68,16 @@ const platSchema = new mongoose.Schema({
 
 platSchema.plugin(aggregatePaginate);
 
+const commandeSchema = new mongoose.Schema({ 
+    client: mongoose.Schema.Types.ObjectId,
+    livreur: mongoose.Schema.Types.ObjectId,
+    daty: Date,
+    plats: [],
+    etat: Number
+});
+
+commandeSchema.plugin(aggregatePaginate);
+
 const Users = new mongoose.model('users', userSchema);
 const Session = new mongoose.model('sessions', sessionSchema);
 const Ville = new mongoose.model('villes', villeSchema);

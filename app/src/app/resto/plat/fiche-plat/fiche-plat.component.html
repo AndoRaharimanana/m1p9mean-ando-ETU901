@@ -9,7 +9,20 @@
         </button></a>
         <a style="margin: 0 5%" href="/access-admin/resto/config-plats/{{id}}"><button type="button" class="btn btn-primary py-2 px-4 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
           Configurer prix
-      </button></a>        
+      </button></a>  
+      <form #myform = "ngForm" (ngSubmit) = "onSubmit(myform)">        
+          <label for="first-name" class="text-sm font-medium text-gray-700">Status</label>                    
+          <select ngModel name="etat" autocomplete="country-name" class="mt-1 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+              <option [selected]="plat.info.etat === 0" value="0">En ligne</option>
+              <option [selected]="plat.info.etat === 1" value="1">Hors ligne</option>
+            </select> 
+            <input ngModel="{{plat.info.prixRevient}}" type="hidden" name="prixRevient">
+            <input ngModel="{{plat.info.prixVente}}" type="hidden" name="prixVente">
+            <input ngModel="{{plat.info.daty}}" type="hidden" name="daty">
+            <input ngModel="{{plat.info.etat}}" type="hidden" name="etatOrigin">
+            <input ngModel="{{id}}" type="hidden" name="idplat">
+            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Changer le status</button>                           
+      </form>            
         <button (click)="deletePlat(plat.info._id)" style="float:right" type="button" class="btn btn-red py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
             Supprimer
         </button>            

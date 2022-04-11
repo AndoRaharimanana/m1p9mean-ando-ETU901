@@ -80,4 +80,28 @@ export class FichePlatComponent implements OnInit {
     })
 }
 
+onSubmit(form: NgForm) {
+  this.spinner.show();
+  console.log(form.value);
+  this.apiService.publishPlat(form.value).subscribe((data) => {      
+    console.log(data);
+    if(data['status'] === 200){
+      this.router.navigate(['/access-admin/resto/fiche-plats/'+data['id']]);  
+     }
+     else if(data['status'] === 202){
+      this.router.navigate(['/access-admin/resto']);  
+     }else if(data['status'] === 201){
+      this.router.navigate(['/access-admin/resto/choose']);  
+     }else{
+      
+     }    
+     this.spinner.hide();      
+  },
+  err => {
+    console.log("errorr");
+    this.router.navigate(['/access-admin/resto']);  
+    this.spinner.hide(); 
+  })
+}
+
 }

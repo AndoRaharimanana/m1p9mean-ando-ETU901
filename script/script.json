@@ -358,11 +358,16 @@ db.plats.aggregate([
 			},
 			{
 				$match:{
-					"_id.daty":{
-						$lte: new Date()
+					$and:{
+						[
+							_id.etat: {$eq: 0},
+							_id.daty:{
+								$lte: new Date()
+							}
+						]
 					}
 				}
-			},
+			}]),
 			{
 				$sort:{
 					"_id.daty": -1
@@ -439,3 +444,21 @@ db.users.aggregate([
 
 
 db.restos.find().pretty()
+
+db.restos.updateOne({
+	_id: new ObjectId("62530039a14d7a7bcace206d"),
+	plats:{
+		$elemMatch:{
+			prixRevient: {$eq: 4000},
+			prixVente: {$eq: 6000},
+			etat: 1,
+			daty: ISODate("2022-04-10T16:38:33.936Z")
+		}
+	}
+	},
+	{
+		$set:{
+			"plats.$.etat": 0
+		}
+	}
+)

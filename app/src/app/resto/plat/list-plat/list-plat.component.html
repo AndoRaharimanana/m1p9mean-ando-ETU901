@@ -73,6 +73,10 @@
       <th scope="col" class="px-6 py-3">
         Bénéfice 
       
+      </th>     
+      <th scope="col" class="px-6 py-3">
+        Status 
+      
       </th>                   
     <th scope="col" class="px-6 py-3">
     <span class="sr-only">Edit</span>
@@ -98,7 +102,13 @@
                   </th>  
                   <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                     <a href="/access-admin/resto/fiche-plats/{{plat.platsinfo._id}}">{{plat.info.benefice}}</a>
-                    </th>                                                          
+                    </th>    
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                      <a href="/access-admin/resto/fiche-plats/{{plat.platsinfo._id}}">
+                        <div *ngIf="plat.info.etat == 0">En ligne</div>
+                        <div *ngIf="plat.info.etat == 1">Hors ligne</div>
+                        </a>
+                      </th>                                                                              
     <td class="px-6 py-4 text-right">
 
         <div class="inline-flex rounded-md shadow-sm" plat="group">
