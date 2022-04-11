@@ -34,8 +34,8 @@ const transporter = nodemailer.createTransport({
     }
   });
 
-//process.env.PORT
-app.listen(1010  , function(){ 
+//1010
+app.listen(process.env.PORT  , function(){ 
     var u = new Users();
     u.id = 546456564;
     console.log(service.createToken(u));  
