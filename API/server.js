@@ -25,6 +25,14 @@ const access_resto = [1, 2, 3];
 const nbPageUser = 10;
 const nbPageClient = 12;
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'bici.teamtask@gmail.com',
+      pass: 'syynmafsaohmhbwu'
+    }
+  });
+
 //process.env.PORT
 app.listen(1010  , function(){ 
     var u = new Users();
@@ -77,6 +85,55 @@ app.post('/upload-test', (req, res) =>{
 
 
 ///////////********CLIENT START* */
+
+
+///////*********/***CLIENT CRUD COMMANDE START */ */
+
+
+
+///////*********/***CLIENT CRUD COMMANDE END */ */
+
+
+///////***RESET MDP */
+app.post('/reset', async (req, res) => {
+    console.log("mail ");
+    console.log(req.body.email);
+    var user = null ;
+    var cursor = await Users.find({email: req.body.email})
+    .then(results =>{
+        console.log("result 1 ");
+        console.log(results);
+        user = results;
+    })
+    .catch(console.error);
+    console.log("users");
+    console.log(user);
+    if(user != null){
+        var newMDP = service.generateMdp();
+        var mdpcrypt = service.crypt(newMDP);
+        await Users.findByIdAndUpdate(
+             mongoose.Types.ObjectId(user[0]._id),
+        {       mdp: mdpcrypt     }
+        ).then(result =>{
+            console.log("mdp updated")
+        })
+        .catch(console.error)
+    }
+    const mailOptions = {
+        from: 'bici.teamtask@gmail.com',
+        to: user[0].email,
+        subject: 'Reset mot de passe',
+        text: 'Nouveau mot de passe '+newMDP
+      };   
+      transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+              console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response+ " "+text);
+          }
+        });   
+}); 
+
 
     ////***TEMPLATE CREATE */
     app.post('/signup', async (req, res) => {

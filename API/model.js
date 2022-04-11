@@ -85,5 +85,6 @@ const Role = new mongoose.model('roles', roleSchema);
 const Resto = new mongoose.model('restos', restoSchema);
 const CategoriePlat = new mongoose.model('categoriePlats', categoriePlatSchema);
 const Plat = new mongoose.model('plats', platSchema);
+const Commande = new mongoose.model('commandes', commandeSchema);
   
 module.exports = { Users, Session, Ville, Role, Resto, CategoriePlat, Plat};

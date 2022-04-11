@@ -1,6 +1,6 @@
 var crypto = require('crypto');
 const mongoose = require('mongoose');
-const { Users, Session, Ville, Role, CategoriePlat, Plat, Resto } = require("./model");
+const { Users, Session, Ville, Role, CategoriePlat, Plat, Resto, Commande } = require("./model");
 function crypt(string){
     return crypto.createHash('md5').update(string).digest('hex');
 }
@@ -469,6 +469,87 @@ async function getDetailPlatAll(cdt){
     .catch(error => console.error(error))                */
 }
 
+async function getCommandeMax(user, daty){
+    return Commande.aggregate([
+        {
+            $match: {
+                $and:[
+                    {
+                        "client": {$eq: mongoose.Types.ObjectId(user)}
+                    },
+                    {
+                        "daty":{
+                            $lte: daty
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $sort:{
+                "daty": -1
+            }
+        },
+        {
+            $limit: 1
+        }
+    ])
+}
+
+async function getCommandeEnCours(user, daty){
+    var commande = new Commande();
+    var commandeMax = null;
+    await this.getCommandeMax(user, daty)
+    .then(results=>{
+        commandeMax = results;
+    })
+    .catch(console.error);
+
+    if((commandeMax == null) || (commandeMax!=null && commandeMax.etat != 0)){
+        commande.client = mongoose.Types.ObjectId(user);
+        commande.daty = new Date();
+        commande.etat = 0;
+        await commande.save()
+        .then(result =>{
+            commande = result;
+        })
+        .catch(console.error)
+    }else{
+        commande = commandeMax;
+    }
+    return commande;
+}
+
+async function ajouterPlat(plat, qte, commande){
+    var cmd = {};
+    var addPlat = {};
+    addPlat = {
+        plats:{
+            "plat": mongoose.Types.ObjectId(plat),
+            "qte": qte,
+            "daty": new Date()
+        }
+    };
+    cmd['$push'] = addPlat;
+    return Commande.findByIdAndUpdate(commande,
+        cmd)
+        .then(results =>{
+            return results
+        })
+        .catch(console.error);
+}
+
+function generateMdp(){
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < charactersLength ; i++ ) {
+          result += characters.charAt(Math.floor(Math.random() * 
+     charactersLength));
+       }
+       return result;    
+}
+
 
 exports.crypt = crypt;
 exports.createToken = createToken;
@@ -486,4 +567,5 @@ exports.getCategoriePlat = getCategoriePlat;
 exports.getDetailPlat = getDetailPlat;
 exports.getRestosRandom = getRestosRandom;
 exports.getDetailPlatAll = getDetailPlatAll;
+exports.generateMdp = generateMdp;
 

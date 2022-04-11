@@ -48,6 +48,7 @@ import { UpdatePlatComponent } from './resto/plat/update-plat/update-plat.compon
 import { PagePlatComponent } from './client/page-plat/page-plat.component';
 import { PageRestoComponent } from './client/page-resto/page-resto.component';
 import { ConfigurationComponent } from './resto/plat/configuration/configuration.component';
+import { ResetPasswordComponent } from './client/reset-password/reset-password.component';
 
 
 
@@ -90,7 +91,8 @@ import { ConfigurationComponent } from './resto/plat/configuration/configuration
     UpdatePlatComponent,
     PagePlatComponent,
     PageRestoComponent,
-    ConfigurationComponent
+    ConfigurationComponent,
+    ResetPasswordComponent
   ],
   imports: [
     BrowserModule,

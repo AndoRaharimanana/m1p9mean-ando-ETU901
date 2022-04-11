@@ -50,5 +50,9 @@ getPlat(id) {
   var c = this.nomdomaine+'/signup-form';    
   return this.http.get(c);     
 }  
+
+resetMdp(mail:any){
+  return this.http.post(this.nomdomaine+"/reset", mail);      
+}
 }
 
